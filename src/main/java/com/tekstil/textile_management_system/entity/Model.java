@@ -23,7 +23,7 @@ public class Model {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(nullable = false)
     private String modelName;
@@ -65,6 +65,26 @@ public class Model {
     //one side is model, there is lots of stages
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelStageHistory> stageHistory = new ArrayList<>();
+
+    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ModelMeasurements> measurements = new ArrayList<>();
+
+    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<ModelComments> materials = new ArrayList<>();
+
+    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<ModelAccessories> accessories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<ModelImages> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<ModelComments> comments = new ArrayList<>();
+
+
+
+
+
 
 
 
