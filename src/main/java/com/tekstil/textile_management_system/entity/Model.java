@@ -81,13 +81,6 @@ public class Model {
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ModelComments> comments = new ArrayList<>();
 
-
-
-
-
-
-
-
     @PreUpdate
     public void preUpdate(){
         this.updatedAt = LocalDateTime.now();
