@@ -1,5 +1,6 @@
 package com.tekstil.textile_management_system.entity;
 
+import com.tekstil.textile_management_system.enums.ModelStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,21 +11,24 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Stage {
+public class Stages {
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "name", nullable = false, unique = true)
+    private ModelStatus name;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
 
     @Column(nullable = false)
     private String displayName;
 
     //asama sirasi
+
     @Column(nullable = false)
-    private Integer orederIndex;
+    private Integer orderIndex;
 
     @Column(length = 1000)
     private String description;

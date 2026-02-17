@@ -40,6 +40,8 @@ public class Model {
     @Column(length = 1000)
     private String description;
 
+
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ModelStatus status = ModelStatus.IN_DESIGN;
@@ -54,6 +56,8 @@ public class Model {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private LocalDateTime updatedAt;
+
+    private LocalDateTime deadline;
 
     @Column(length = 2000)
     private String notes;
@@ -70,7 +74,7 @@ public class Model {
     private List<ModelMeasurements> measurements = new ArrayList<>();
 
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<ModelComments> materials = new ArrayList<>();
+    private List<ModelMaterials> materials = new ArrayList<>();
 
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ModelAccessories> accessories = new ArrayList<>();

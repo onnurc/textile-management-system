@@ -14,33 +14,31 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ModelRepository extends JpaRepository {
+public interface ModelRepository extends JpaRepository<Model, Long> {
 
-    Optional findByModelNo(String model_no);
-    List findByBrand(String brand);
-    List findByStatus(ModelStatus status);
-    List findByPriority(Priority priority);
+    Optional <Model>findByModelName(String modelName);
+    List <Model>findByBrand(String brand);
+    List <Model>findByStatus(ModelStatus status);
+    List <Model>findByPriority(Priority priority);
+    List<Model> findByCategory(String category);
 
 //    List findByUser(User user);
-
 
     List <Model>findByStatusAndPriority(ModelStatus status, Priority priority);
     List <Model>findByBrandAndSeason(String brand,String season);
 
-
     List <Model>findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
     List <Model>findByDeadlineBefore(LocalDateTime date); // deadline expired
 
-    List <Model>findByAssignedToId(User userId);
-    List <Model>findByCreatedById(User userId);
+    List <Model>findByAssignedTo_Id(Long userId);
 
-    @Query("SELECT m FROM MOdel m WHERE m.status = :status AND m.deadline < :now") //select*from model
+    @Query("SELECT m FROM Model m WHERE m.status = :status AND m.deadline < :now") //select*from model
     List <Model>findOverdueModels(@Param("status") ModelStatus status,@Param("now") LocalDateTime now);
 
-    List <Model>CountByStatus(ModelStatus modelStatus);
-    List <Model>CountByPriority(Priority priority);
+    Long countByStatus(ModelStatus modelStatus);
+    Long countByPriority(Priority priority);
 
-    boolean existByModelNo (String modelNo);
+    boolean existsByModelName(String modelName);
 
 
 }

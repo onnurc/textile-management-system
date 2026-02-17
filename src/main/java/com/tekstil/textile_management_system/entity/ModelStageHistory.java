@@ -2,7 +2,6 @@ package com.tekstil.textile_management_system.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.Length;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +19,7 @@ public class ModelStageHistory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stage_id", nullable = false)
-    private Stage stage;
+    private Stages stage;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_user_id", foreignKey = @ForeignKey(name = "FK_HISTORY_USER"))
