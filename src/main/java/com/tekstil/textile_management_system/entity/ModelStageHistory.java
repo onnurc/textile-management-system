@@ -19,11 +19,11 @@ public class ModelStageHistory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stage_id", nullable = false)
-    private Stages stage;
+    private Stage stage;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_user_id", foreignKey = @ForeignKey(name = "FK_HISTORY_USER"))
-    private User assigndUser;
+    private User assignedUser;
 
     private LocalDateTime completedAt;
 

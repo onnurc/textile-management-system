@@ -21,6 +21,7 @@ public class ModelMaterials {
     @JoinColumn(name = "model_id")
     private Model model;
 
+
     @Column(nullable = false)
     private String materialType; // kumas, tela, marsel
     private String description; // normally it is not nullable, it is my decision right now
