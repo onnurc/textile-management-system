@@ -23,7 +23,6 @@ public class ModelComments {
     @JoinColumn(name = "model_id", nullable = false)
     private Model model;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stage_history_id")
     private ModelStageHistory stageHistory;

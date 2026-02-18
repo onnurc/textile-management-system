@@ -26,7 +26,7 @@ public class ModelAccessories{
     @Column(nullable = false)
     private String description;
 
-S    private String color;
+    private String color;
     private Integer quantityPerUnit; //  required amount for single sample
     private Integer totalRequired; // total order amount
 
