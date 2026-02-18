@@ -40,8 +40,6 @@ public class Model {
     @Column(length = 1000)
     private String description;
 
-
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ModelStatus status = ModelStatus.IN_DESIGN;

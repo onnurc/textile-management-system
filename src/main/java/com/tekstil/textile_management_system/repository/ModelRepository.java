@@ -22,6 +22,7 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
     List <Model>findByPriority(Priority priority);
     List<Model> findByCategory(String category);
 
+
 //    List findByUser(User user);
 
     List <Model>findByStatusAndPriority(ModelStatus status, Priority priority);
@@ -39,6 +40,8 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
     Long countByPriority(Priority priority);
 
     boolean existsByModelName(String modelName);
+
+
 
 
 }
