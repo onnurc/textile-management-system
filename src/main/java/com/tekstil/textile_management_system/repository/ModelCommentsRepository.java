@@ -17,5 +17,4 @@ public interface ModelCommentsRepository extends JpaRepository<ModelComments, Lo
     List<ModelComments> findByCommentTextContains(String keyword);
     List<ModelComments> findByCreatedAtBeforeOrderByCreatedAtDesc(LocalDateTime localDateTime);
 
-
 }

@@ -34,6 +34,7 @@ public class ModelImages {
     @JoinColumn(name = "uploaded_by_user_id")
     private User uploadedBy;
 
+    @Column(nullable = false)
     private LocalDateTime uploadedAt = LocalDateTime.now();
 
     @Column(length = 500)
