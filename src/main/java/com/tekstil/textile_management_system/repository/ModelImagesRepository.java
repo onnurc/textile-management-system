@@ -4,10 +4,12 @@ import com.tekstil.textile_management_system.entity.Model;
 import com.tekstil.textile_management_system.entity.ModelImages;
 import com.tekstil.textile_management_system.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Repository
 public interface ModelImagesRepository extends JpaRepository<ModelImages, Long> {
 
     List<ModelImages> findByModel(Model model);

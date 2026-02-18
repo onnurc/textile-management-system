@@ -5,10 +5,12 @@ import com.tekstil.textile_management_system.entity.ModelComments;
 import com.tekstil.textile_management_system.entity.ModelStageHistory;
 import com.tekstil.textile_management_system.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Repository
 public interface ModelCommentsRepository extends JpaRepository<ModelComments, Long> {
 
     List<ModelComments> findByModel(Model model);
