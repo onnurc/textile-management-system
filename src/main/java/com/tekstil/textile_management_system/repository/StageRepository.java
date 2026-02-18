@@ -15,11 +15,7 @@ public interface StageRepository extends JpaRepository<Stage,Long> {
     List<Stage> findByActiveTrue();
 
     List<Stage> findByActiveTrueOrderByOrderIndexAsc();
-    List<Stage> findByRequiredChecklistContainingIgnoreCase(String keyword);
+    List<Stage> findByRequiredChecklistContainingIgnoreCase(String keyword);//
     List<Stage> findByEstimatedDurationHoursLessThan(Integer estimatedDurationHours);
-
-
-
-
 
 }
