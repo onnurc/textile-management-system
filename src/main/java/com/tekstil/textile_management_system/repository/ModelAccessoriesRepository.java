@@ -16,5 +16,4 @@ public interface ModelAccessoriesRepository extends JpaRepository <ModelAccessor
     List<ModelAccessories> findAllByOrderByQuantityPerUnitAsc(Integer quantityPerUnit);
     List<ModelAccessories> findByTotalRequired(Integer totalRequired);
     List<ModelAccessories> findBySupplier(String supplier);
-
 }
