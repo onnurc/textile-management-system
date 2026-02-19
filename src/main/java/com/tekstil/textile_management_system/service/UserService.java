@@ -39,7 +39,4 @@ public class UserService {
         return userRepository.findByCreatedAtAfter(localDateTime);
     }
 
-
-
-
 }

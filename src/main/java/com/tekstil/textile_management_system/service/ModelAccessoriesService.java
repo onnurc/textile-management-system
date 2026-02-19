@@ -30,7 +30,4 @@ public class ModelAccessoriesService {
     public List<ModelAccessories> findBySupplier(String supplier){
         return modelAccessoriesRepository.findBySupplier(supplier);
     }
-
-
-
 }
