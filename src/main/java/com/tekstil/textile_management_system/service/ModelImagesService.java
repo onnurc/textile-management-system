@@ -26,13 +26,17 @@ public class ModelImagesService {
     public void deleteImage(Long id){
          modelImagesRepository.deleteById(id);
     }
-    public List<ModelImages> findByModel(Model model){
+    public List<ModelImages> findByModel(Long modelId){
+        Model model = new Model();
+        model.setId(modelId);
         return modelImagesRepository.findByModel(model);
     }
     public List<ModelImages> findByImageType(String imageType){
         return modelImagesRepository.findByImageType(imageType);
     }
-    public List<ModelImages> findByUploadedBy(User user){
+    public List<ModelImages> findByUploadedBy(Long userId){
+        User user = new User();
+        user.setId(userId);
         return modelImagesRepository.findByUploadedBy(user);
     }
     public List<ModelImages> findByUploadedAtBeforeOrderByUploadedAtAsc(LocalDateTime localDateTime){
@@ -42,4 +46,11 @@ public class ModelImagesService {
         return modelImagesRepository.findByDescriptionContains(keyword);
     }
 
+    public ModelImages updateImage(Long id, ModelImages modelImages) {
+        ModelImages existing = modelImagesRepository.findById(id).orElseThrow(()-> new RuntimeException("Image not found : " + id));
+        existing.setImageType(modelImages.getImageType());
+        existing.setDescription(modelImages.getDescription());
+        existing.setUploadedBy(modelImages.getUploadedBy());
+        return modelImagesRepository.save(existing);
+    }
 }

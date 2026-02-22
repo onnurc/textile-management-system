@@ -6,7 +6,6 @@ import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.repository.ModelRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.Banner;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class ModelService {
+
     private final ModelRepository modelRepository;
 
 
@@ -43,6 +43,17 @@ public class ModelService {
 
     public void deleteModel(Long id){
         modelRepository.deleteById(id);
+    }
+
+
+    public List<Model> modelStatus(ModelStatus modelStatus){
+        return modelRepository.findByStatus(modelStatus);
+    }
+
+    public Model changeStatus(Long id, ModelStatus status){
+        Model existing = modelRepository.findById(id).orElseThrow(()-> new RuntimeException("Model not found: " + id));
+        existing.setStatus(status);
+        return modelRepository.save(existing);
     }
 
     public Model updateModel(Long id, Model updatedModel){
