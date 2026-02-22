@@ -68,21 +68,6 @@ public class Model {
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelStageHistory> stageHistory = new ArrayList<>();
 
-    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ModelMeasurements> measurements = new ArrayList<>();
-
-    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<ModelMaterials> materials = new ArrayList<>();
-
-    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<ModelAccessories> accessories = new ArrayList<>();
-
-    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<ModelImages> images = new ArrayList<>();
-
-    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<ModelComments> comments = new ArrayList<>();
-
     @PreUpdate
     public void preUpdate(){
         this.updatedAt = LocalDateTime.now();
