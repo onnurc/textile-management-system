@@ -1,5 +1,12 @@
 package com.tekstil.textile_management_system.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class BaseResponse<T> {
 
     private boolean success;
@@ -7,51 +14,12 @@ public class BaseResponse<T> {
     private String message;
     private T data;
 
-    public BaseResponse() {
+    // Başarılı response için static factory method
+    public static <T> BaseResponse<T> success(int code, String message, T data) {
+        return new BaseResponse<>(true, code, message, data);
     }
-
-    public BaseResponse(boolean success, int code, String message, T data) {
-        this.success = success;
-        this.code = code;
-        this.message = message;
-        this.data = data;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public void setData(T data) {
-        this.data = data;
+    // Hatalı response için static factory method
+    public static <T> BaseResponse<T> error(int code, String message) {
+        return new BaseResponse<>(false, code, message, null);
     }
 }
-//{
-//        "success": true,
-//        "code": 200,
-//        "message": "Operation completed successfully",
-//        "data": {}
-//        }

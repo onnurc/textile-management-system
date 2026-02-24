@@ -36,8 +36,8 @@ public class ModelStageHistoryService {
         return modelStageHistoryRepository.findByModel_IdOrderByCompletedAtDesc(modelId);
     }
 
-    public List<ModelStageHistory> findByStage(Stage stage) {
-        return modelStageHistoryRepository.findByStage(stage);
+    public List<ModelStageHistory> findByStage(Long stageId) {
+        return modelStageHistoryRepository.findByStage_Id(stageId);
     }
 
     public List<ModelStageHistory> findByAssignedUser(User user) {

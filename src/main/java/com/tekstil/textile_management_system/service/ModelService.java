@@ -3,12 +3,14 @@ package com.tekstil.textile_management_system.service;
 
 import com.tekstil.textile_management_system.entity.Model;
 import com.tekstil.textile_management_system.enums.ModelStatus;
+import com.tekstil.textile_management_system.exception.ResourceNotFoundException;
 import com.tekstil.textile_management_system.repository.ModelRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +22,7 @@ public class ModelService {
 
     public Model createModel(Model model){
         if (modelRepository.existsByModelName(model.getModelName())){
-            throw new RuntimeException("Model name already exist: " + model.getModelName());
+            throw new ResourceNotFoundException("Model name already exist: " + model.getModelName());
         }
         if(model.getStatus() == null){
             model.setStatus(ModelStatus.IN_DESIGN);
@@ -46,9 +48,7 @@ public class ModelService {
     }
 
 
-    public List<Model> modelStatus(ModelStatus modelStatus){
-        return modelRepository.findByStatus(modelStatus);
-    }
+
 
     public Model changeStatus(Long id, ModelStatus status){
         Model existing = modelRepository.findById(id).orElseThrow(()-> new RuntimeException("Model not found: " + id));
@@ -75,8 +75,17 @@ public class ModelService {
     }
 
 
+    public Optional<Model> findById(Long id) {
+        return modelRepository.findById(id);
+    }
 
 
+    public Optional<Model> findByModelName(String modelName) {
+        return modelRepository.findByModelName(modelName);
+    }
 
 
+    public List<Model> findByStatus(ModelStatus status) {
+        return modelRepository.findByStatus(status);
+    }
 }

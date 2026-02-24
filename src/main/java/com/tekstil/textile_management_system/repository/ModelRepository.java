@@ -1,7 +1,6 @@
 package com.tekstil.textile_management_system.repository;
 
 import com.tekstil.textile_management_system.entity.Model;
-import com.tekstil.textile_management_system.entity.User;
 import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.enums.Priority;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,7 +17,6 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
 
     Optional <Model>findByModelName(String modelName);
     List <Model>findByBrand(String brand);
-    List <Model>findByStatus(ModelStatus status);
     List <Model>findByPriority(Priority priority);
     List<Model> findByCategory(String category);
 
@@ -42,6 +40,5 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
     boolean existsByModelName(String modelName);
 
 
-
-
+    List<Model> findByStatus(ModelStatus status);
 }

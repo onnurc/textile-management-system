@@ -14,7 +14,7 @@ import java.util.List;
 public interface ModelStageHistoryRepository extends JpaRepository<ModelStageHistory, Long> {
 
     List<ModelStageHistory> findByModel_IdOrderByCompletedAtDesc(Long modelId);
-    List<ModelStageHistory> findByStage(Stage stage);
+    List<ModelStageHistory> findByStage_Id(Long stageId);
     List<ModelStageHistory> findByAssignedUserOrderByCompletedAtDesc(User user);
     List<ModelStageHistory> findByStatus(String status);
 

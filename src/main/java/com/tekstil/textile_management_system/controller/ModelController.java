@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+
+import static org.springframework.web.servlet.function.ServerResponse.status;
 
 @RestController
 @RequestMapping("/api/models")
@@ -19,71 +22,127 @@ public class ModelController {
 
     //CREATE: POST /api/models
     @PostMapping
-    public ResponseEntity<Model> createModel(@RequestBody Model model){
-        Model created = modelService.createModel(model);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity<BaseResponse<Model>> createModel(@RequestBody Model model) {
+        Optional<Model> model1 = modelService.findByModelName(model.getModelName());
+        if (model1.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(BaseResponse.error(HttpStatus.CONFLICT.value(), "This name is already taken"));
+        }
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(BaseResponse.success(HttpStatus.CREATED.value(), "model created", modelService.createModel(model)));
     }
+
     //READ ALL: GET /api/models
 
     @GetMapping
-    public ResponseEntity<List<Model>> getAllModels(){
-        List <Model> models = modelService.findAll();
-        return ResponseEntity.ok(models);
+    public ResponseEntity<BaseResponse<List<Model>>> getAllModels() {
+        List<Model> models = modelService.findAll();
+
+        String message = models.isEmpty() ? "No models found in database" : "All models retrieved successfully";
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(BaseResponse.success(HttpStatus.OK.value(), message, models));
+
     }
 
     // READ ONE: GET /api/models/5
 
     @GetMapping("/{id}")
-    public ResponseEntity<Model> getModelById(@PathVariable Long id){
-        Model model = modelService.getModelById(id);
-        return ResponseEntity.ok(model);
-    }
-   // READ BY MODEL NAME:  GET /api/models/by-model-name/M8306
-   @GetMapping("/by-name/{modelName}")
-    public ResponseEntity<Model> getByModelName(@PathVariable String modelName){
-        Model model = modelService.getModelByModelName(modelName);
-        return ResponseEntity.ok(model);
-    }
-    // READ BY STATUS: GET /api/models/status/
+    public ResponseEntity<BaseResponse<Model>> getModelById(@PathVariable Long id) {
 
+        Optional<Model> model1  = modelService.findById(id);
+
+        if (model1.isEmpty()){
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "No content in database"));
+        }
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Models by Id",model1.get()));
+    }
+
+    // READ BY MODEL NAME: GET/api/models/by-model-name/M8306
+    @GetMapping("/by-name/{modelName}")
+    public ResponseEntity<BaseResponse<Model>> getByModelName(@PathVariable String modelName) {
+        Model model1 = modelService.getModelByModelName(modelName);
+        if (model1 == null) {
+
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "No models exists with this name"));
+        }else{
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(BaseResponse.success(HttpStatus.OK.value(), "Models by name",model1));
+
+        }
+    }
+
+    // READ BY STATUS: GET /api/models/status/
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Model>> getByStatus(@PathVariable ModelStatus status){
-        List <Model> models = modelService.modelStatus(status);
-        return ResponseEntity.ok(models);
+    public ResponseEntity<BaseResponse<List<Model>>> getByModelStatus(@PathVariable ModelStatus status) {
+        List <Model> model1 = modelService.findByStatus(status);
+        if (model1.isEmpty()) {
+            return  ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "No models with tihs status "));
+        }else {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(BaseResponse.success(HttpStatus.OK.value(), "Models by status", model1));
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Model> updateModel(@PathVariable Long id, @RequestBody Model model) {
-        Model updated = modelService.updateModel(id, model);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<BaseResponse<Model>> updateModel(@PathVariable Long id, @RequestBody Model model) {
+        Optional<Model> model2 = modelService.findById(id);
+        if (model2.isEmpty()){
+           return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "No mode with this id"));
+        }else {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(BaseResponse.success(HttpStatus.OK.value(), "model updated", modelService.updateModel(id, model)));
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse> deleteModel(@PathVariable Long id){
-        boolean hasModel = true;
-        try {
-
-            modelService.getModelById(id);
-        }catch (Exception e){
-            hasModel = false;
-        }
-        if (hasModel){
+    public ResponseEntity<BaseResponse<Void>> deleteModel(@PathVariable Long id) {
+        Model model = modelService.getModelById(id);
+        if (model == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus
+                            .NOT_FOUND.value(), "no model exists with this id"));
+        } else {
             modelService.deleteModel(id);
-            return ResponseEntity.ok().build();
-
-        }else {
-            BaseResponse baseResponse = new BaseResponse<>(true,HttpStatus.NO_CONTENT.value(),"bu id'ye ait model bulunamadı",null);
-            return ResponseEntity.ok(baseResponse);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(BaseResponse.success(HttpStatus.OK.value(), "Model deleted", null));
         }
-//        modelService.deleteModel(id);
-//        return  ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Model> changeStatus(@PathVariable Long id, @RequestParam ModelStatus status) {
-        Model updated = modelService.changeStatus(id, status);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<BaseResponse<Model>> changeStatus(@PathVariable Long id, @RequestParam ModelStatus status) {
+        Optional<Model> model = modelService.findById(id);
+        if (model.isPresent()) {
+            if (model.get().getStatus() == status) {
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(BaseResponse.error(HttpStatus.BAD_REQUEST.value(), "status already : " + status));
+            } else {
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(BaseResponse.success(HttpStatus.OK.value(), "model status updated", modelService.changeStatus(id, status)));
+            }
+        }
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "model not found"));
     }
-
-
 }

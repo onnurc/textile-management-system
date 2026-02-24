@@ -19,6 +19,9 @@ public class StageController {
 
     @PostMapping
     public ResponseEntity<Stage> createStage(@RequestBody Stage stage) {
+
+         Stage stage1 = stageService.createStage(stage);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(stageService.createStage(stage));
     }
 
