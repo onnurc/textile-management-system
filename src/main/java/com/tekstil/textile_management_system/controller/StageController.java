@@ -1,5 +1,6 @@
 package com.tekstil.textile_management_system.controller;
 
+import com.tekstil.textile_management_system.dto.BaseResponse;
 import com.tekstil.textile_management_system.entity.Stage;
 import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.service.StageService;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/stages")
@@ -18,11 +20,15 @@ public class StageController {
     private final StageService stageService;
 
     @PostMapping
-    public ResponseEntity<Stage> createStage(@RequestBody Stage stage) {
+    public ResponseEntity<?> createStage(@RequestBody Stage stage) {
+         Optional <Stage> stage1 = stageService.findStageByName(stage.getName());
+         if (stage1.isPresent()) {
 
-         Stage stage1 = stageService.createStage(stage);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(stageService.createStage(stage));
+                 return ResponseEntity
+                         .status(HttpStatus.CONFLICT)
+                         .body(BaseResponse.error(HttpStatus.CONFLICT.value(), "stage already taken"));
+             }
+             return ResponseEntity.status(HttpStatus.CREATED).body(stageService.createStage(stage));
     }
 
     @GetMapping("/{id}")

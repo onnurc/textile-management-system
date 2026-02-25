@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -67,5 +68,13 @@ public class StageService {
 
     public void deleteStage(Long id) {
         stageRepository.deleteById(id);
+    }
+
+    public Stage findStageById(Long id) {
+        return stageRepository.findStageById(id);
+    }
+
+    public Optional<Stage> findStageByName(ModelStatus name) {
+        return stageRepository.findByName(name);
     }
 }

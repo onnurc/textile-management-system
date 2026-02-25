@@ -20,4 +20,6 @@ public interface StageRepository extends JpaRepository<Stage,Long> {
     List<Stage> findByRequiredChecklistContainingIgnoreCase(String keyword);//
     List<Stage> findByEstimatedDurationHoursLessThan(Integer estimatedDurationHours);
 
+     Stage findStageById(Long id);
+
 }

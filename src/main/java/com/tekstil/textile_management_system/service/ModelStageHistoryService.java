@@ -1,15 +1,13 @@
 package com.tekstil.textile_management_system.service;
 
-import com.tekstil.textile_management_system.entity.Model;
 import com.tekstil.textile_management_system.entity.ModelStageHistory;
-import com.tekstil.textile_management_system.entity.Stage;
-import com.tekstil.textile_management_system.entity.User;
 import com.tekstil.textile_management_system.repository.ModelStageHistoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,9 +21,9 @@ public class ModelStageHistoryService {
         return modelStageHistoryRepository.save(stageHistory);
     }
 
-    public ModelStageHistory getStageHistoryById(Long id) {
-        return modelStageHistoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Stage history not found: " + id));
+    public Optional<ModelStageHistory> getStageHistoryById(Long id) {
+        return Optional.of(modelStageHistoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Stage history not found: " + id)));
     }
 
     public List<ModelStageHistory> findAll() {
@@ -40,8 +38,8 @@ public class ModelStageHistoryService {
         return modelStageHistoryRepository.findByStage_Id(stageId);
     }
 
-    public List<ModelStageHistory> findByAssignedUser(User user) {
-        return modelStageHistoryRepository.findByAssignedUserOrderByCompletedAtDesc(user);
+    public List<ModelStageHistory> findByAssignedUser(String userName) {
+        return modelStageHistoryRepository.findByAssignedUserOrderByCompletedAtDesc(userName);
     }
 
     public List<ModelStageHistory> findByStatus(String status) {
@@ -67,4 +65,10 @@ public class ModelStageHistoryService {
     public void deleteStageHistory(Long id) {
         modelStageHistoryRepository.deleteById(id);
     }
+
+    public boolean existsByModelIdAndStageId(Long id, Long id1) {
+        return modelStageHistoryRepository.existsByModelIdAndStageId(id,id1);
+    }
+
+
 }
