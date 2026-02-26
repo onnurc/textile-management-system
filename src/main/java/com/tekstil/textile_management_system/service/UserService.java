@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -61,5 +62,13 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
 
+    }
+
+    public List<User> findByEmailSingle(String email) {
+        return findByEmail(email);
+    }
+
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
     }
 }

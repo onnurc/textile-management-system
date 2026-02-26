@@ -1,5 +1,6 @@
 package com.tekstil.textile_management_system.controller;
 
+import com.tekstil.textile_management_system.dto.BaseResponse;
 import com.tekstil.textile_management_system.entity.User;
 import com.tekstil.textile_management_system.enums.Role;
 import com.tekstil.textile_management_system.service.UserService;
@@ -11,71 +12,182 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
 
+    private final UserService userService;
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user){
+    public ResponseEntity<BaseResponse<User>> createUser(@RequestBody @Valid User user) {
+        List<User> existing = userService.findByEmail(user.getEmail());
+
+        if (!existing.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(BaseResponse.error(HttpStatus.CONFLICT.value(), "Email already in use: " + user.getEmail()));
+        }
+
         User created = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(BaseResponse.success(HttpStatus.CREATED.value(), "User created", created));
     }
+
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers(){
-        List<User> Users = userService.getAllUsers();
-        return ResponseEntity.ok(Users);
+    public ResponseEntity<BaseResponse<List<User>>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+
+        if (users.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(BaseResponse.success(HttpStatus.NO_CONTENT.value(), "No users found", users));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Users listed", users));
     }
+
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id){
-        User user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<BaseResponse<User>> getUserById(@PathVariable Long id) {
+        Optional<User> user = userService.findById(id);
+
+        if (user.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "No user found with id: " + id));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "User found", user.get()));
     }
+
     @GetMapping("/role/{role}")
-    public ResponseEntity <List<User>> getUserByRole(@PathVariable Role role){
-        List<User> user = userService.getUsersByRole(role);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<BaseResponse<List<User>>> getUserByRole(@PathVariable Role role) {
+        List<User> users = userService.getUsersByRole(role);
+
+        if (users.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(BaseResponse.success(HttpStatus.NO_CONTENT.value(), "No users found with role: " + role, users));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Users with role " + role, users));
     }
 
     @GetMapping("/active")
-    public ResponseEntity <List<User>> getUserByActive(){
-        List<User> user = userService.findByActive();
-        return ResponseEntity.ok(user);
-    }
-    @GetMapping("/email/{email}")
-    public ResponseEntity<List<User>> findByEmail(@PathVariable String email ){
-        List<User> emails = userService.findByEmail(email);
-        return ResponseEntity.ok(emails);
+    public ResponseEntity<BaseResponse<List<User>>> getActiveUsers() {
+        List<User> users = userService.findByActive();
 
+        if (users.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(BaseResponse.success(HttpStatus.NO_CONTENT.value(), "No active users found", users));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Active users listed", users));
     }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<BaseResponse<List<User>>> findByEmail(@PathVariable String email) {
+        if (email == null || email.isBlank()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(BaseResponse.error(HttpStatus.BAD_REQUEST.value(), "Email cannot be empty"));
+        }
+
+        List<User> users = userService.findByEmail(email);
+
+        if (users.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "No users found with email: " + email));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Users found", users));
+    }
+
     @GetMapping("/created-after")
-    ResponseEntity<List<User>> findByCreatedAtAfter(@RequestParam LocalDateTime localDateTime){
+    public ResponseEntity<BaseResponse<List<User>>> findByCreatedAtAfter(@RequestParam LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(BaseResponse.error(HttpStatus.BAD_REQUEST.value(), "Date parameter cannot be null"));
+        }
+
         List<User> users = userService.findByCreatedAtAfter(localDateTime);
-        return ResponseEntity.ok(users);
+
+        if (users.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(BaseResponse.success(HttpStatus.NO_CONTENT.value(), "No users found after: " + localDateTime, users));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Users created after " + localDateTime, users));
     }
 
     @GetMapping("/search/{keyword}")
-    public ResponseEntity<List<User>> findByFullNameContaining(@PathVariable String keyword){
-        List <User> users = userService.findByFullNameContainingIgnoreCase(keyword);
-        return ResponseEntity.ok(users);
+    public ResponseEntity<BaseResponse<List<User>>> findByFullNameContaining(@PathVariable String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(BaseResponse.error(HttpStatus.BAD_REQUEST.value(), "Keyword cannot be empty"));
+        }
+
+        List<User> users = userService.findByFullNameContainingIgnoreCase(keyword);
+
+        if (users.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(BaseResponse.success(HttpStatus.NO_CONTENT.value(), "No users found for keyword: " + keyword, users));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Users matching: " + keyword, users));
     }
-    //get is ready  continue tomorrow
 
     @PatchMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id , @Valid @RequestBody User user){
-        User updated = userService.updateUser(id,user);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<BaseResponse<User>> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
+        Optional<User> existing = userService.findById(id);
+
+        if (existing.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "No user found with id: " + id));
+        }
+
+        User updated = userService.updateUser(id, user);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "User updated", updated));
     }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
+    public ResponseEntity<BaseResponse<Void>> deleteUser(@PathVariable Long id) {
+        Optional<User> existing = userService.findById(id);
+
+        if (existing.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "No user found with id: " + id));
+        }
+
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "User deleted successfully", null));
     }
-
-
-
-
-
 }

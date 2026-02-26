@@ -5,7 +5,6 @@ import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.repository.StageRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -73,8 +72,8 @@ public class StageService {
         stageRepository.deleteById(id);
     }
 
-    public Stage findStageById(Long id) {
-        return stageRepository.findStageById(id);
+    public Optional<Stage> findById(Long id) {
+        return stageRepository.findById(id);
     }
 
     public Optional<Stage> findStageByName(ModelStatus name) {

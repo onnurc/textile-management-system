@@ -32,6 +32,7 @@ public class ModelController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(BaseResponse.success(HttpStatus.CREATED.value(), "model created", modelService.createModel(model)));
+
     }
 
     //READ ALL: GET /api/models

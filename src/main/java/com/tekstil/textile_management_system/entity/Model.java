@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.enums.Priority;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,6 +39,7 @@ public class Model {
     @Column(nullable = false)
     private String category;
 
+    @Size(max = 2000, message = "description cannot be longer than 1000 characters")
     @Column(length = 1000)
     private String description;
 
@@ -58,6 +60,7 @@ public class Model {
 
     private LocalDateTime deadline;
 
+    @Size(max = 2000, message = "note cannot be longer than 2000 characters")
     @Column(length = 2000)
     private String notes;
 

@@ -1,7 +1,6 @@
 package com.tekstil.textile_management_system.controller;
 
 import com.tekstil.textile_management_system.dto.BaseResponse;
-import com.tekstil.textile_management_system.entity.ModelStageHistory;
 import com.tekstil.textile_management_system.entity.Stage;
 import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.service.ModelStageHistoryService;
@@ -26,8 +25,6 @@ public class StageController {
     public ResponseEntity<?> createStage(@RequestBody Stage stage) {
          Optional <Stage> stage1 = stageService.findStageByName(stage.getName());
 
-
-
          if (stage1.isPresent()) {
 
                  return ResponseEntity
@@ -38,48 +35,151 @@ public class StageController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Stage> getStageById(@PathVariable Long id) {
-        return ResponseEntity.ok(stageService.getStageById(id));
+    public ResponseEntity<BaseResponse<Stage>> getStageById(@PathVariable Long id) {
+        Optional<Stage> stage = stageService.findById(id);
+
+        if (stage.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "No stage found with id: " + id));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Stage found", stage.get()));
     }
 
     @GetMapping("/by-name")
-    public ResponseEntity<Stage> getStageByName(@RequestParam ModelStatus name) {
-        return ResponseEntity.ok(stageService.getStageByName(name));
+    public ResponseEntity<BaseResponse<Stage>> getStageByName(@RequestParam ModelStatus name) {
+        Stage stage = stageService.getStageByName(name);
+
+        if (stage == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "No stage found with name: " + name));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Stage found", stage));
     }
 
     @GetMapping
-    public ResponseEntity<List<Stage>> getAllStages() {
-        return ResponseEntity.ok(stageService.findAll());
+    public ResponseEntity<BaseResponse<List<Stage>>> getAllStages() {
+        List<Stage> stages = stageService.findAll();
+
+        if (stages.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(BaseResponse.success(HttpStatus.NO_CONTENT.value(), "No stages found", stages));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Stages listed", stages));
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<Stage>> getActiveStages() {
-        return ResponseEntity.ok(stageService.findActiveStages());
+    public ResponseEntity<BaseResponse<List<Stage>>> getActiveStages() {
+        List<Stage> stages = stageService.findActiveStages();
+
+        if (stages.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(BaseResponse.success(HttpStatus.NO_CONTENT.value(), "No active stages found", stages));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Active stages listed", stages));
     }
 
     @GetMapping("/active/ordered")
-    public ResponseEntity<List<Stage>> getActiveStagesOrdered() {
-        return ResponseEntity.ok(stageService.findActiveStagesOrdered());
+    public ResponseEntity<BaseResponse<List<Stage>>> getActiveStagesOrdered() {
+        List<Stage> stages = stageService.findActiveStagesOrdered();
+
+        if (stages.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(BaseResponse.success(HttpStatus.NO_CONTENT.value(), "No active stages found", stages));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Active stages listed (ordered)", stages));
     }
 
+
     @GetMapping("/search/checklist")
-    public ResponseEntity<List<Stage>> findByChecklist(@RequestParam String keyword) {
-        return ResponseEntity.ok(stageService.findByChecklist(keyword));
+    public ResponseEntity<BaseResponse<List<Stage>>> findByChecklist(@RequestParam String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(BaseResponse.error(HttpStatus.BAD_REQUEST.value(), "Keyword cannot be empty"));
+        }
+
+        List<Stage> stages = stageService.findByChecklist(keyword);
+
+        if (stages.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(BaseResponse.success(HttpStatus.NO_CONTENT.value(), "No stages found for keyword: " + keyword, stages));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Stages found for keyword: " + keyword, stages));
     }
 
     @GetMapping("/search/duration")
-    public ResponseEntity<List<Stage>> findByDurationLessThan(@RequestParam Integer hours) {
-        return ResponseEntity.ok(stageService.findByEstimatedDurationLessThan(hours));
+    public ResponseEntity<BaseResponse<List<Stage>>> findByDurationLessThan(@RequestParam Integer hours) {
+        if (hours == null || hours <= 0) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(BaseResponse.error(HttpStatus.BAD_REQUEST.value(), "Hours must be greater than 0"));
+        }
+        List<Stage> stages = stageService.findByEstimatedDurationLessThan(hours);
+
+        if (stages.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(BaseResponse.success(HttpStatus.NO_CONTENT.value(), "No stages found under " + hours + " hours", stages));
+        }
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Stages with duration less than " + hours + " hours", stages));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Stage> updateStage(@PathVariable Long id, @RequestBody Stage stage) {
-        return ResponseEntity.ok(stageService.updateStage(id, stage));
+    public ResponseEntity<BaseResponse<Stage>> updateStage(@PathVariable Long id, @RequestBody Stage stage) {
+        Optional<Stage> existing = stageService.findById(id);
+
+        if (existing.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "No stage found with id: " + id));
+        }
+        Stage updated = stageService.updateStage(id, stage);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Stage updated", updated));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStage(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse<Void>> deleteStage(@PathVariable Long id) {
+        Optional<Stage> existing = stageService.findById(id);
+
+        if (existing.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(BaseResponse.error(HttpStatus.NOT_FOUND.value(), "No stage found with id: " + id));
+        }
+
         stageService.deleteStage(id);
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "Stage deleted successfully", null));
     }
 }
