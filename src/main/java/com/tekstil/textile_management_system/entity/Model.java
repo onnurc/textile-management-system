@@ -1,6 +1,7 @@
 package com.tekstil.textile_management_system.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.enums.Priority;
 import jakarta.persistence.*;
@@ -65,6 +66,7 @@ public class Model {
     private User assignedTo;
 
     //one side is model, there is lots of stages
+    @JsonIgnore
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelStageHistory> stageHistory = new ArrayList<>();
 

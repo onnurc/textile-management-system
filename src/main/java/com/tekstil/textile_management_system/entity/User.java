@@ -33,9 +33,10 @@ public class User {
     private Role role;
 
     @Column(nullable = false)
-    private boolean active;
+    private Boolean active;
 
     private LocalDate createdAt = LocalDate.now();
+
 
 
 }

@@ -1,7 +1,11 @@
 package com.tekstil.textile_management_system.service;
 
+import com.tekstil.textile_management_system.entity.Model;
 import com.tekstil.textile_management_system.entity.ModelStageHistory;
+import com.tekstil.textile_management_system.entity.Stage;
+import com.tekstil.textile_management_system.repository.ModelRepository;
 import com.tekstil.textile_management_system.repository.ModelStageHistoryRepository;
+import com.tekstil.textile_management_system.repository.StageRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,8 +20,19 @@ public class ModelStageHistoryService {
 
     private final ModelStageHistoryRepository modelStageHistoryRepository;
 
+    private final ModelRepository modelRepository;
+    private final StageRepository stageRepository;
+
     public ModelStageHistory createStageHistory(ModelStageHistory stageHistory) {
+        Model model = modelRepository.findById(stageHistory.getModel().getId())
+                .orElseThrow(() -> new RuntimeException("Model not found"));
+        Stage stage = stageRepository.findById(stageHistory.getStage().getId())
+                .orElseThrow(() -> new RuntimeException("Stage not found"));
+
+        stageHistory.setModel(model);
+        stageHistory.setStage(stage);
         stageHistory.preUpdate();
+
         return modelStageHistoryRepository.save(stageHistory);
     }
 

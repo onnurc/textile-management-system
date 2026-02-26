@@ -52,7 +52,7 @@ public class UserService {
         existing.setEmail(updateUser.getEmail());
         existing.setFullName(updateUser.getFullName());
         existing.setRole(updateUser.getRole());
-        existing.setActive(updateUser.isActive());
+        existing.setActive(updateUser.getActive());
 
         return userRepository.save(existing);
     }

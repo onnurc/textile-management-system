@@ -1,8 +1,10 @@
 package com.tekstil.textile_management_system.controller;
 
 import com.tekstil.textile_management_system.dto.BaseResponse;
+import com.tekstil.textile_management_system.entity.ModelStageHistory;
 import com.tekstil.textile_management_system.entity.Stage;
 import com.tekstil.textile_management_system.enums.ModelStatus;
+import com.tekstil.textile_management_system.service.ModelStageHistoryService;
 import com.tekstil.textile_management_system.service.StageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,10 +20,14 @@ import java.util.Optional;
 public class StageController {
 
     private final StageService stageService;
+    private final ModelStageHistoryService modelStageHistoryService;
 
     @PostMapping
     public ResponseEntity<?> createStage(@RequestBody Stage stage) {
          Optional <Stage> stage1 = stageService.findStageByName(stage.getName());
+
+
+
          if (stage1.isPresent()) {
 
                  return ResponseEntity

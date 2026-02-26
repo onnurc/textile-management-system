@@ -5,6 +5,7 @@ import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.repository.StageRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class StageService {
+
+
 
     private final StageRepository stageRepository;
 
@@ -61,7 +64,7 @@ public class StageService {
         existing.setDescription(updated.getDescription());
         existing.setRequiredChecklist(updated.getRequiredChecklist());
         existing.setEstimatedDurationHours(updated.getEstimatedDurationHours());
-        existing.setActive(updated.isActive());
+        existing.setActive(updated.getActive());
 
         return stageRepository.save(existing);
     }

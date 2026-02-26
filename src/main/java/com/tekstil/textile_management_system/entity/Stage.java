@@ -18,7 +18,6 @@ public class Stage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @Enumerated(EnumType.STRING)
     @Column(name = "name", nullable = false, unique = true)
     private ModelStatus name;
@@ -41,6 +40,6 @@ public class Stage {
     private Integer estimatedDurationHours;
 
     @Column(nullable = false)
-    private boolean active = true;
+    private Boolean active = true;
 
 }

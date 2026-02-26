@@ -13,8 +13,8 @@ public class ModelStageHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "model_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "model_id",nullable = false)
     private Model model;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,7 +22,7 @@ public class ModelStageHistory {
     private Stage stage;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assigned_user_id", foreignKey = @ForeignKey(name = "FK_HISTORY_USER"))
+    @JoinColumn(name = "assigned_user_id", foreignKey = @ForeignKey(name = "FK_HISTORY_USER"),nullable = false)
     private User assignedUser;
 
     private LocalDateTime completedAt;
