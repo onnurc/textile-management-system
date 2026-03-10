@@ -4,13 +4,12 @@ package com.tekstil.textile_management_system.service;
 import com.tekstil.textile_management_system.entity.Model;
 import com.tekstil.textile_management_system.entity.User;
 import com.tekstil.textile_management_system.enums.ModelStatus;
+import com.tekstil.textile_management_system.exception.AlreadyExistsException;
 import com.tekstil.textile_management_system.exception.ResourceNotFoundException;
 import com.tekstil.textile_management_system.repository.ModelRepository;
 import com.tekstil.textile_management_system.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +20,6 @@ import java.util.Optional;
 @Transactional
 public class ModelService {
 
-
-
     private final UserRepository userRepository;
     private final ModelRepository modelRepository;
 
@@ -31,51 +28,61 @@ public class ModelService {
 
         if (model.getAssignedTo() != null) {
             User user = userRepository.findById(model.getAssignedTo().getId())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
             model.setAssignedTo(user);
         }
-
         if (modelRepository.existsByModelName(model.getModelName())){
-            throw new ResourceNotFoundException("Model name already exist: " + model.getModelName());
+            throw new AlreadyExistsException("Model name already exist: " + model.getModelName());
         }
         if(model.getStatus() == null){
             model.setStatus(ModelStatus.IN_DESIGN);
         }
         return modelRepository.save(model);
     }
+    public List <Model> findAll(){
+        List<Model> models = modelRepository.findAll();
 
-    public Model getModelById(Long id){
-        return modelRepository.findById(id).orElseThrow(() -> new RuntimeException("Model can't find" + id));
+        if (models.isEmpty()){
+            throw new ResourceNotFoundException("No model found ");
+        }
+
+        return models;
+
     }
-    public Model getModelByModelName(String name){
-        return modelRepository.findByModelName(name).orElseThrow(() -> new RuntimeException("No such model with : " + name));
+
+
+    public Model getModelByModelName(String name) {
+        return modelRepository.findByModelName(name)
+                .orElseThrow(() -> new ResourceNotFoundException("No model found with this name: " + name));
     }
+
     public List<Model> getModelByBrand(String brand){
         return modelRepository.findByBrand(brand);
     }
-    public List <Model> findAll(){
-        return modelRepository.findAll();
-    }
 
-    public void deleteModel(Long id){
+
+    public void deleteModel(Long id) {
+        if (!   modelRepository.existsById(id)){
+            throw new ResourceNotFoundException("Model not found: " + id);
+    }
         modelRepository.deleteById(id);
     }
 
-
-
-
     public Model changeStatus(Long id, ModelStatus status){
-        Model existing = modelRepository.findById(id).orElseThrow(()-> new RuntimeException("Model not found: " + id));
+        Model existing = modelRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Model not found: " + id));
+        if(existing.getStatus() == status){
+            throw new AlreadyExistsException("Status already: " + status);
+        }
         existing.setStatus(status);
         return modelRepository.save(existing);
     }
 
     public Model updateModel(Long id, Model updatedModel){
-        Model existing = modelRepository.findById(id).orElseThrow(()-> new RuntimeException("Model not found" + id));
+        Model existing = modelRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Model not found" + id));
 
         if (updatedModel.getAssignedTo() != null) {
             User user = userRepository.findById(updatedModel.getAssignedTo().getId())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
             existing.setAssignedTo(user);
         }
 
@@ -90,22 +97,27 @@ public class ModelService {
         existing.setDeadline(updatedModel.getDeadline());
         existing.setStatus(updatedModel.getStatus());
 
+
+
         return modelRepository.save(existing);
 
     }
 
+    public Model findById(Long id) {
 
-    public Optional<Model> findById(Long id) {
-        return modelRepository.findById(id);
+        return modelRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("No model with this id"));
     }
-
 
     public Optional<Model> findByModelName(String modelName) {
         return modelRepository.findByModelName(modelName);
     }
 
-
     public List<Model> findByStatus(ModelStatus status) {
-        return modelRepository.findByStatus(status);
+        List<Model> models = modelRepository.findByStatus(status);
+        if (models.isEmpty()){
+            throw new ResourceNotFoundException("No model found for status: " + status);
+        }
+        return models;
+
     }
 }
