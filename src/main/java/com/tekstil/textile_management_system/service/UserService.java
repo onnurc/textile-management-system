@@ -2,6 +2,8 @@ package com.tekstil.textile_management_system.service;
 
 import com.tekstil.textile_management_system.entity.User;
 import com.tekstil.textile_management_system.enums.Role;
+import com.tekstil.textile_management_system.exception.AlreadyExistsException;
+import com.tekstil.textile_management_system.exception.ResourceNotFoundException;
 import com.tekstil.textile_management_system.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,7 @@ public class UserService {
 
     public User createUser(User user){
         if (userRepository.existsByEmail(user.getEmail())){
-            throw new RuntimeException("User already exists: " + user.getEmail());
+            throw new AlreadyExistsException("User already exists: " + user.getEmail());
         }
         return userRepository.save(user);
     }
@@ -40,7 +42,7 @@ public class UserService {
         return userRepository.findAll();
     }
     public User getUserById(Long id){
-        return userRepository.findById(id).orElseThrow(()-> new RuntimeException("User not found: " + id));
+        return userRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("User not found: " + id));
     }
 
     public List <User> getUsersByRole(Role role) {
@@ -48,7 +50,7 @@ public class UserService {
     }
 
     public User updateUser(Long id, User updateUser) {
-        User existing = userRepository.findById(id).orElseThrow(()-> new RuntimeException("User not found : " + id));
+        User existing = userRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("User not found : " + id));
 
         existing.setEmail(updateUser.getEmail());
         existing.setFullName(updateUser.getFullName());
@@ -61,7 +63,6 @@ public class UserService {
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
-
     }
 
     public List<User> findByEmailSingle(String email) {

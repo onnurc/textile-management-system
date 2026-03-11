@@ -22,13 +22,7 @@ public class UserController {
     private final UserService userService;
     @PostMapping
     public ResponseEntity<BaseResponse<User>> createUser(@RequestBody @Valid User user) {
-        List<User> existing = userService.findByEmail(user.getEmail());
 
-        if (!existing.isEmpty()) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body(BaseResponse.error(HttpStatus.CONFLICT.value(), "Email already in use: " + user.getEmail()));
-        }
 
         User created = userService.createUser(user);
         return ResponseEntity
