@@ -32,7 +32,6 @@ public class ModelController {
     }
 
     //READ ALL: GET /api/models
-
     @GetMapping
     public ResponseEntity<BaseResponse<List<Model>>> getAllModels() {
         List<Model> models = modelService.findAll();

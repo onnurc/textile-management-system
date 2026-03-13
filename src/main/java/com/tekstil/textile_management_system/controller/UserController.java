@@ -1,6 +1,8 @@
 package com.tekstil.textile_management_system.controller;
 
 import com.tekstil.textile_management_system.dto.BaseResponse;
+import com.tekstil.textile_management_system.dto.UserRequestDTO;
+import com.tekstil.textile_management_system.dto.UserResponseDTO;
 import com.tekstil.textile_management_system.entity.User;
 import com.tekstil.textile_management_system.enums.Role;
 import com.tekstil.textile_management_system.service.UserService;
@@ -21,10 +23,10 @@ public class UserController {
 
     private final UserService userService;
     @PostMapping
-    public ResponseEntity<BaseResponse<User>> createUser(@RequestBody @Valid User user) {
+    public ResponseEntity<BaseResponse<UserResponseDTO>> createUser(@RequestBody @Valid UserRequestDTO userRequestDTO) {
 
 
-        User created = userService.createUser(user);
+        UserResponseDTO created = userService.createUser(userRequestDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(BaseResponse.success(HttpStatus.CREATED.value(), "User created", created));

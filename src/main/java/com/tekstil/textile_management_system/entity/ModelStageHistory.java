@@ -43,6 +43,7 @@ public class ModelStageHistory {
     @Column(length = 2000)
     private String notes;
 
+    @PreUpdate
     public void preUpdate(){
         if ("COMPLETED".equals(this.status) && this.completedAt == null){
             this.completedAt = LocalDateTime.now();

@@ -1,9 +1,12 @@
 package com.tekstil.textile_management_system.service;
 
+import com.tekstil.textile_management_system.dto.UserRequestDTO;
+import com.tekstil.textile_management_system.dto.UserResponseDTO;
 import com.tekstil.textile_management_system.entity.User;
 import com.tekstil.textile_management_system.enums.Role;
 import com.tekstil.textile_management_system.exception.AlreadyExistsException;
 import com.tekstil.textile_management_system.exception.ResourceNotFoundException;
+import com.tekstil.textile_management_system.mapper.UserMapper;
 import com.tekstil.textile_management_system.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +22,13 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
 
-    public User createUser(User user){
-        if (userRepository.existsByEmail(user.getEmail())){
-            throw new AlreadyExistsException("User already exists: " + user.getEmail());
+    public UserResponseDTO createUser(UserRequestDTO dto){
+        if (userRepository.existsByEmail(dto.getEmail())){
+            throw new AlreadyExistsException("User already exists: " + dto.getEmail());
         }
-        return userRepository.save(user);
+
+        User saved = userRepository.save(UserMapper.toEntity(dto));
+        return UserMapper.toResponseDTO(saved);
     }
     public List<User> findByEmail(String email){
         return userRepository.findByEmail(email);
