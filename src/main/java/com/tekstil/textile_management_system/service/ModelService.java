@@ -1,6 +1,8 @@
 package com.tekstil.textile_management_system.service;
 
 
+import com.tekstil.textile_management_system.dto.ModelRequestDTO;
+import com.tekstil.textile_management_system.dto.ModelResponseDTO;
 import com.tekstil.textile_management_system.entity.Model;
 import com.tekstil.textile_management_system.entity.User;
 import com.tekstil.textile_management_system.enums.ModelStatus;
@@ -11,6 +13,7 @@ import com.tekstil.textile_management_system.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.tekstil.textile_management_system.mapper.ModelMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,36 +26,39 @@ public class ModelService {
     private final UserRepository userRepository;
     private final ModelRepository modelRepository;
 
+    public ModelResponseDTO createModel(ModelRequestDTO dto) {
+        if (modelRepository.existsByModelName(dto.getModelName())) {
+            throw new AlreadyExistsException("Model already exists: " + dto.getModelName());
+        }
 
-    public Model createModel(Model model){
+        Model model = ModelMapper.toEntity(dto);
 
-        if (model.getAssignedTo() != null) {
-            User user = userRepository.findById(model.getAssignedTo().getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (dto.getAssignedToUserId() != null) {
+            User user = userRepository.findById(dto.getAssignedToUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found: " + dto.getAssignedToUserId()));
             model.setAssignedTo(user);
         }
-        if (modelRepository.existsByModelName(model.getModelName())){
-            throw new AlreadyExistsException("Model name already exist: " + model.getModelName());
-        }
-        if(model.getStatus() == null){
-            model.setStatus(ModelStatus.IN_DESIGN);
-        }
-        return modelRepository.save(model);
+
+        return ModelMapper.toResponseDTO(modelRepository.save(model));
     }
-    public List <Model> findAll(){
+
+    public List <ModelResponseDTO> findAll(){
         List<Model> models = modelRepository.findAll();
 
         if (models.isEmpty()){
             throw new ResourceNotFoundException("No model found ");
         }
 
-        return models;
-
+        return models
+                .stream()
+                .map(ModelMapper::toResponseDTO)
+                .toList();
     }
 
 
-    public Model getModelByModelName(String name) {
+    public ModelResponseDTO getModelByModelName(String name) {
         return modelRepository.findByModelName(name)
+                .map(ModelMapper::toResponseDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("No model found with this name: " + name));
     }
 
@@ -68,20 +74,20 @@ public class ModelService {
         modelRepository.deleteById(id);
     }
 
-    public Model changeStatus(Long id, ModelStatus status){
+    public ModelResponseDTO changeStatus(Long id, ModelStatus status){
         Model existing = modelRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Model not found: " + id));
         if(existing.getStatus() == status){
             throw new AlreadyExistsException("Status already: " + status);
         }
         existing.setStatus(status);
-        return modelRepository.save(existing);
+        return ModelMapper.toResponseDTO(modelRepository.save(existing));
     }
 
-    public Model updateModel(Long id, Model updatedModel){
+    public ModelResponseDTO updateModel(Long id, ModelRequestDTO updatedModel){
         Model existing = modelRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Model not found" + id));
 
-        if (updatedModel.getAssignedTo() != null) {
-            User user = userRepository.findById(updatedModel.getAssignedTo().getId())
+        if (updatedModel.getAssignedToUserId() != null) {
+            User user = userRepository.findById(updatedModel.getAssignedToUserId())
                     .orElseThrow(() -> new ResourceNotFoundException("User not found"));
             existing.setAssignedTo(user);
         }
@@ -97,27 +103,30 @@ public class ModelService {
         existing.setDeadline(updatedModel.getDeadline());
         existing.setStatus(updatedModel.getStatus());
 
-
-
-        return modelRepository.save(existing);
+        return ModelMapper.toResponseDTO(modelRepository.save(existing)); // ✅
 
     }
 
-    public Model findById(Long id) {
+    public ModelResponseDTO findById(Long id) {
 
-        return modelRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("No model with this id"));
+        return modelRepository.findById(id)
+                .map(ModelMapper::toResponseDTO)
+                .orElseThrow(()-> new ResourceNotFoundException("No model with this id"));
     }
 
     public Optional<Model> findByModelName(String modelName) {
         return modelRepository.findByModelName(modelName);
     }
 
-    public List<Model> findByStatus(ModelStatus status) {
+    public List<ModelResponseDTO> findByStatus(ModelStatus status) {
         List<Model> models = modelRepository.findByStatus(status);
         if (models.isEmpty()){
             throw new ResourceNotFoundException("No model found for status: " + status);
         }
-        return models;
+        return models
+                .stream()
+                .map(ModelMapper::toResponseDTO)
+                .toList();
 
     }
 }

@@ -9,9 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.sql.results.graph.Fetch;
 
-import javax.smartcardio.ATR;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,9 +53,7 @@ public class Model {
     private String sizeRange;
 
     private LocalDateTime createdAt = LocalDateTime.now();
-
     private LocalDateTime updatedAt;
-
     private LocalDateTime deadline;
 
     @Size(max = 2000, message = "note cannot be longer than 2000 characters")
@@ -77,16 +73,5 @@ public class Model {
     public void preUpdate(){
         this.updatedAt = LocalDateTime.now();
     }
-
-
-
-
-
-
-
-
-
-
-
 
 }

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -22,59 +21,74 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
 
-    public UserResponseDTO createUser(UserRequestDTO dto){
-        if (userRepository.existsByEmail(dto.getEmail())){
+    public UserResponseDTO createUser(UserRequestDTO dto) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
             throw new AlreadyExistsException("User already exists: " + dto.getEmail());
         }
-
         User saved = userRepository.save(UserMapper.toEntity(dto));
         return UserMapper.toResponseDTO(saved);
     }
-    public List<User> findByEmail(String email){
-        return userRepository.findByEmail(email);
+
+    public UserResponseDTO findById(Long id) {
+        return userRepository.findById(id)
+                .map(UserMapper::toResponseDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
     }
 
-    public List<User> findByActive(){
-        return userRepository.findByActiveTrue();
-    }
-    public List<User> findByFullNameContainingIgnoreCase(String fullName){
-        return userRepository.findByFullNameContainingIgnoreCase(fullName);
-    }
-    public List<User> findByCreatedAtAfter(LocalDateTime localDateTime){
-        return userRepository.findByCreatedAtAfter(localDateTime);
-    }
-    public List<User> getAllUsers(){
-        return userRepository.findAll();
-    }
-    public User getUserById(Long id){
-        return userRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("User not found: " + id));
+    public UserResponseDTO findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(UserMapper::toResponseDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
-    public List <User> getUsersByRole(Role role) {
-        return userRepository.findByRole(role);
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toResponseDTO)
+                .toList();
     }
 
-    public User updateUser(Long id, User updateUser) {
-        User existing = userRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("User not found : " + id));
-
-        existing.setEmail(updateUser.getEmail());
-        existing.setFullName(updateUser.getFullName());
-        existing.setRole(updateUser.getRole());
-        existing.setActive(updateUser.getActive());
-
-        return userRepository.save(existing);
+    public List<UserResponseDTO> getUsersByRole(Role role) {
+        return userRepository.findByRole(role)
+                .stream()
+                .map(UserMapper::toResponseDTO)
+                .toList();
     }
 
+    public List<UserResponseDTO> findByActive() {
+        return userRepository.findByActiveTrue()
+                .stream()
+                .map(UserMapper::toResponseDTO)
+                .toList();
+    }
+
+    public List<UserResponseDTO> findByFullNameContainingIgnoreCase(String fullName) {
+        return userRepository.findByFullNameContainingIgnoreCase(fullName)
+                .stream()
+                .map(UserMapper::toResponseDTO)
+                .toList();
+    }
+
+    public List<UserResponseDTO> findByCreatedAtAfter(LocalDateTime localDateTime) {
+        return userRepository.findByCreatedAtAfter(localDateTime)
+                .stream()
+                .map(UserMapper::toResponseDTO)
+                .toList();
+    }
+
+    public UserResponseDTO updateUser(Long id, UserRequestDTO dto) {
+        User existing = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+        existing.setEmail(dto.getEmail());
+        existing.setFullName(dto.getFullName());
+        existing.setRole(dto.getRole());
+        return UserMapper.toResponseDTO(userRepository.save(existing));
+    }
 
     public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User not found: " + id);
+        }
         userRepository.deleteById(id);
-    }
-
-    public List<User> findByEmailSingle(String email) {
-        return findByEmail(email);
-    }
-
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
     }
 }

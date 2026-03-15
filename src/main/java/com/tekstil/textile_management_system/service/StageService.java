@@ -1,10 +1,19 @@
 package com.tekstil.textile_management_system.service;
 
+import com.tekstil.textile_management_system.dto.BaseResponse;
+import com.tekstil.textile_management_system.dto.StageRequestDTO;
+import com.tekstil.textile_management_system.dto.StageResponseDTO;
+import com.tekstil.textile_management_system.dto.UserResponseDTO;
 import com.tekstil.textile_management_system.entity.Stage;
 import com.tekstil.textile_management_system.enums.ModelStatus;
+import com.tekstil.textile_management_system.exception.AlreadyExistsException;
+import com.tekstil.textile_management_system.exception.ResourceNotFoundException;
+import com.tekstil.textile_management_system.mapper.StageMapper;
 import com.tekstil.textile_management_system.repository.StageRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +28,15 @@ public class StageService {
 
     private final StageRepository stageRepository;
 
-    public Stage createStage(Stage stage) {
-        return stageRepository.save(stage);
+    public StageResponseDTO createStage(StageRequestDTO dto) {
+        if (stageRepository.findByName(dto.getName()).isPresent()){
+            throw new AlreadyExistsException("Stage already taken");
+        }
+
+        Stage stage = StageMapper.toEntity(dto);
+        Stage saved = stageRepository.save(stage);
+        return StageMapper.toResponseDTO(saved);
+
     }
 
     public Stage getStageById(Long id) {
@@ -28,32 +44,50 @@ public class StageService {
                 .orElseThrow(() -> new RuntimeException("Stage not found: " + id));
     }
 
-    public Stage getStageByName(ModelStatus name) {
+    public StageResponseDTO getStageByName(ModelStatus name) {
         return stageRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Stage not found: " + name));
+                .map(StageMapper::toResponseDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("Stage not found: " + name));
     }
 
-    public List<Stage> findAll() {
-        return stageRepository.findAll();
+    public List<StageResponseDTO> findAll() {
+
+        return stageRepository.findAll()
+                .stream()
+                .map(StageMapper::toResponseDTO)
+                .toList();
     }
 
-    public List<Stage> findActiveStages() {
-        return stageRepository.findByActiveTrue();
+    public List<StageResponseDTO> findActiveStages() {
+
+        return stageRepository.findByActiveTrue()
+                .stream()
+                .map(StageMapper::toResponseDTO)
+                .toList();
     }
 
-    public List<Stage> findActiveStagesOrdered() {
-        return stageRepository.findByActiveTrueOrderByOrderIndexAsc();
+    public List<StageResponseDTO> findActiveStagesOrdered() {
+        return stageRepository.findByActiveTrueOrderByOrderIndexAsc()
+                .stream()
+                .map(StageMapper::toResponseDTO)
+                .toList();
     }
 
-    public List<Stage> findByChecklist(String keyword) {
-        return stageRepository.findByRequiredChecklistContainingIgnoreCase(keyword);
+    public List<StageResponseDTO> findByChecklist(String keyword) {
+        return stageRepository.findByRequiredChecklistContainingIgnoreCase(keyword)
+                .stream()
+                .map(StageMapper::toResponseDTO)
+                .toList();
     }
 
-    public List<Stage> findByEstimatedDurationLessThan(Integer hours) {
-        return stageRepository.findByEstimatedDurationHoursLessThan(hours);
+    public List<StageResponseDTO> findByEstimatedDurationLessThan(Integer hours) {
+        return stageRepository.findByEstimatedDurationHoursLessThan(hours)
+                .stream()
+                .map(StageMapper::toResponseDTO)
+                .toList();
     }
 
-    public Stage updateStage(Long id, Stage updated) {
+    public StageResponseDTO updateStage(Long id, StageRequestDTO updated) {
         Stage existing = stageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Stage not found: " + id));
 
@@ -65,18 +99,26 @@ public class StageService {
         existing.setEstimatedDurationHours(updated.getEstimatedDurationHours());
         existing.setActive(updated.getActive());
 
-        return stageRepository.save(existing);
+        return StageMapper.toResponseDTO(stageRepository.save(existing));
     }
 
     public void deleteStage(Long id) {
+        if (!stageRepository.existsById(id)){
+            throw new ResourceNotFoundException("Stage not found with id : " +id);
+        }
         stageRepository.deleteById(id);
     }
 
-    public Optional<Stage> findById(Long id) {
-        return stageRepository.findById(id);
+    public StageResponseDTO findById(Long id) {
+
+        return stageRepository.findById(id)
+                .map(StageMapper::toResponseDTO)
+                .orElseThrow(()-> new ResourceNotFoundException("No stage with this id: " + id));
+
     }
 
-    public Optional<Stage> findStageByName(ModelStatus name) {
-        return stageRepository.findByName(name);
+    public Optional<StageResponseDTO> findStageByName(ModelStatus name) {
+        return stageRepository.findByName(name)
+                .map(StageMapper::toResponseDTO);
     }
 }

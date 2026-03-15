@@ -25,8 +25,6 @@ public class Stage {
     @Column(nullable = false)
     private String displayName;
 
-    //asama sirasi
-
     @Column(nullable = false)
     private Integer orderIndex;
 

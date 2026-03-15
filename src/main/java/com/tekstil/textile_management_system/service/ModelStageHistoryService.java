@@ -1,17 +1,22 @@
 package com.tekstil.textile_management_system.service;
 
+import com.tekstil.textile_management_system.dto.StageHistoryRequestDTO;
+import com.tekstil.textile_management_system.dto.StageHistoryResponseDTO;
 import com.tekstil.textile_management_system.entity.Model;
 import com.tekstil.textile_management_system.entity.ModelStageHistory;
 import com.tekstil.textile_management_system.entity.Stage;
+import com.tekstil.textile_management_system.entity.User;
+import com.tekstil.textile_management_system.exception.ResourceNotFoundException;
+import com.tekstil.textile_management_system.mapper.StageHistoryMapper;
 import com.tekstil.textile_management_system.repository.ModelRepository;
 import com.tekstil.textile_management_system.repository.ModelStageHistoryRepository;
 import com.tekstil.textile_management_system.repository.StageRepository;
+import com.tekstil.textile_management_system.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,51 +27,79 @@ public class ModelStageHistoryService {
 
     private final ModelRepository modelRepository;
     private final StageRepository stageRepository;
+    private final UserRepository userRepository;
 
-    public ModelStageHistory createStageHistory(ModelStageHistory stageHistory) {
-        Model model = modelRepository.findById(stageHistory.getModel().getId())
-                .orElseThrow(() -> new RuntimeException("Model not found"));
-        Stage stage = stageRepository.findById(stageHistory.getStage().getId())
-                .orElseThrow(() -> new RuntimeException("Stage not found"));
 
-        stageHistory.setModel(model);
-        stageHistory.setStage(stage);
-        stageHistory.preUpdate();
 
-        return modelStageHistoryRepository.save(stageHistory);
+    public StageHistoryResponseDTO createStageHistory(StageHistoryRequestDTO dto) {
+
+        Model model = modelRepository.findById(dto.getModelId())
+                .orElseThrow(() -> new ResourceNotFoundException("Model not found"));
+
+        Stage stage = stageRepository.findById(dto.getStageId())
+                .orElseThrow(() -> new ResourceNotFoundException("Stage not found"));
+
+        User user = userRepository.findById(dto.getAssignedUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        ModelStageHistory history = StageHistoryMapper.toEntity(dto);
+        history.setModel(model);
+        history.setStage(stage);
+        history.setAssignedUser(user);
+
+        ModelStageHistory saved = modelStageHistoryRepository.save(history);
+        return StageHistoryMapper.toResponseDTO(saved);
+    }
+    public StageHistoryResponseDTO getStageHistoryById(Long id) {
+        return StageHistoryMapper.toResponseDTO(
+                modelStageHistoryRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("Stage history not found: " + id))
+        );
     }
 
-    public Optional<ModelStageHistory> getStageHistoryById(Long id) {
-        return Optional.of(modelStageHistoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Stage history not found: " + id)));
+    public List<StageHistoryResponseDTO> findAll() {
+        return modelStageHistoryRepository.findAll()
+                .stream()
+                .map(StageHistoryMapper::toResponseDTO)
+                .toList();
+
+    }
+    public List<StageHistoryResponseDTO> findByModelId(Long modelId) {
+        return modelStageHistoryRepository.findByModel_IdOrderByCompletedAtDesc(modelId)
+                .stream()
+                .map(StageHistoryMapper::toResponseDTO)
+                .toList();
     }
 
-    public List<ModelStageHistory> findAll() {
-        return modelStageHistoryRepository.findAll();
+    public List<StageHistoryResponseDTO> findByStage(Long stageId) {
+        return modelStageHistoryRepository.findByStage_Id(stageId)
+                .stream()
+                .map(StageHistoryMapper::toResponseDTO)
+                .toList();
     }
 
-    public List<ModelStageHistory> findByModelId(Long modelId) {
-        return modelStageHistoryRepository.findByModel_IdOrderByCompletedAtDesc(modelId);
+    public List<StageHistoryResponseDTO> findByAssignedUser(String userName) {
+        return modelStageHistoryRepository.findByAssignedUserOrderByCompletedAtDesc(userName)
+                .stream()
+                .map(StageHistoryMapper::toResponseDTO)
+                .toList();
     }
-
-    public List<ModelStageHistory> findByStage(Long stageId) {
-        return modelStageHistoryRepository.findByStage_Id(stageId);
-    }
-
-    public List<ModelStageHistory> findByAssignedUser(String userName) {
-        return modelStageHistoryRepository.findByAssignedUserOrderByCompletedAtDesc(userName);
-    }
-
     public List<ModelStageHistory> findByStatus(String status) {
         return modelStageHistoryRepository.findByStatus(status);
     }
 
-    public ModelStageHistory updateStageHistory(Long id, ModelStageHistory updated) {
+    public StageHistoryResponseDTO updateStageHistory(Long id, StageHistoryRequestDTO updated) {
         ModelStageHistory existing = modelStageHistoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Stage history not found: " + id));
 
-        existing.setStage(updated.getStage());
-        existing.setAssignedUser(updated.getAssignedUser());
+        Stage stage = stageRepository.findById(updated.getStageId())
+                .orElseThrow(()-> new ResourceNotFoundException("No stage found with this id: " + id));
+
+        User user = userRepository.findById(updated.getAssignedUserId())
+                        .orElseThrow(()-> new ResourceNotFoundException("No user found with this id: " + id));
+
+        existing.setStage(stage);
+        existing.setAssignedUser(user);
         existing.setStatus(updated.getStatus());
         existing.setEstimatedEndDate(updated.getEstimatedEndDate());
         existing.setWaitingReason(updated.getWaitingReason());
@@ -74,17 +107,13 @@ public class ModelStageHistoryService {
         existing.setNotes(updated.getNotes());
         existing.preUpdate();
 
-        return modelStageHistoryRepository.save(existing);
+        return StageHistoryMapper.toResponseDTO(modelStageHistoryRepository.save(existing));
     }
-
     public void deleteStageHistory(Long id) {
         modelStageHistoryRepository.deleteById(id);
     }
 
-    public boolean existsByModelIdAndStageId(Long id, Long id1) {
-        return modelStageHistoryRepository.existsByModelIdAndStageId(id,id1);
+    public boolean existsByModelIdAndStageId(Long modelId, Long stageId) {
+        return modelStageHistoryRepository.existsByModelIdAndStageId(modelId,stageId);
     }
-
-
-
 }

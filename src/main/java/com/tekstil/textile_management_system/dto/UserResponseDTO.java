@@ -4,6 +4,7 @@ import com.tekstil.textile_management_system.enums.Role;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class UserResponseDTO {
@@ -13,7 +14,7 @@ public class UserResponseDTO {
     private String fullName;
     private Role role;
     private Boolean active;
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
 
 

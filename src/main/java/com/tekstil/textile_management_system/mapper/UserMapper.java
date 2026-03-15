@@ -4,8 +4,7 @@ import com.tekstil.textile_management_system.dto.UserRequestDTO;
 import com.tekstil.textile_management_system.dto.UserResponseDTO;
 import com.tekstil.textile_management_system.entity.User;
 import com.tekstil.textile_management_system.enums.Role;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class UserMapper {
 
@@ -17,7 +16,7 @@ public class UserMapper {
         user.setFullName(dto.getFullName());
         user.setActive(true);
         user.setRole(Role.STYLIST);
-        user.setCreatedAt(LocalDate.now());
+        user.setCreatedAt(LocalDateTime.now());
         user.setRole(dto.getRole());
 
         return user;

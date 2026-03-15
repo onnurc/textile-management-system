@@ -17,25 +17,14 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
 
     Optional <Model>findByModelName(String modelName);
     List <Model>findByBrand(String brand);
+
     List <Model>findByPriority(Priority priority);
     List<Model> findByCategory(String category);
 
 
-//    List findByUser(User user);
-
-    List <Model>findByStatusAndPriority(ModelStatus status, Priority priority);
-    List <Model>findByBrandAndSeason(String brand,String season);
-
-    List <Model>findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
-    List <Model>findByDeadlineBefore(LocalDateTime date); // deadline expired
-
-    List <Model>findByAssignedTo_Id(Long userId);
 
     @Query("SELECT m FROM Model m WHERE m.status = :status AND m.deadline < :now") //select*from model
     List <Model>findOverdueModels(@Param("status") ModelStatus status,@Param("now") LocalDateTime now);
-
-    Long countByStatus(ModelStatus modelStatus);
-    Long countByPriority(Priority priority);
 
     boolean existsByModelName(String modelName);
 
