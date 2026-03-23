@@ -7,9 +7,11 @@ import com.tekstil.textile_management_system.dto.BaseResponse;
 import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.service.ModelService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.tekstil.textile_management_system.service.ModelService;
 
@@ -21,6 +23,7 @@ import static org.springframework.web.servlet.function.ServerResponse.status;
 @RestController
 @RequestMapping("/api/models")
 @RequiredArgsConstructor
+@Validated
 public class ModelController {
     private final ModelService modelService;
 
@@ -77,7 +80,7 @@ public class ModelController {
 
     }
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse<ModelResponseDTO>> updateModel(@PathVariable Long id, @RequestBody ModelRequestDTO dto) {
+    public ResponseEntity<BaseResponse<ModelResponseDTO>> updateModel(@PathVariable Long id, @RequestBody @Valid ModelRequestDTO dto) {
 
             return ResponseEntity
                     .status(HttpStatus.OK)
@@ -94,7 +97,7 @@ public class ModelController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<BaseResponse<ModelResponseDTO>> changeStatus(@PathVariable Long id, @RequestParam ModelStatus status) {
+    public ResponseEntity<BaseResponse<ModelResponseDTO>> changeStatus(@PathVariable @Min(1) Long id, @RequestParam  ModelStatus status) {
 
                 return ResponseEntity
                         .status(HttpStatus.OK)

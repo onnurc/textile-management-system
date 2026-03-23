@@ -6,9 +6,11 @@ import com.tekstil.textile_management_system.dto.UserResponseDTO;
 import com.tekstil.textile_management_system.enums.Role;
 import com.tekstil.textile_management_system.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -17,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
 
     private final UserService userService;
@@ -37,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse<UserResponseDTO>> getUserById(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse<UserResponseDTO>> getUserById(@PathVariable @Min(1) Long id) {
         UserResponseDTO user = userService.findById(id);
         return ResponseEntity.ok(BaseResponse.success(200, "User found", user));
     }
@@ -76,13 +79,13 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<BaseResponse<UserResponseDTO>> updateUser(
-            @PathVariable Long id, @RequestBody @Valid UserRequestDTO dto) {
+            @PathVariable @Min(1) Long id, @RequestBody @Valid UserRequestDTO dto) {
         UserResponseDTO updated = userService.updateUser(id, dto);
         return ResponseEntity.ok(BaseResponse.success(200, "User updated", updated));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse<Void>> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse<Void>> deleteUser(@PathVariable @Min(1) Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok(BaseResponse.success(200, "User deleted", null));
     }

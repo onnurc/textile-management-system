@@ -25,6 +25,7 @@ public class Stage {
     @Column(nullable = false)
     private String displayName;
 
+
     @Column(nullable = false)
     private Integer orderIndex;
 

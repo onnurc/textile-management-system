@@ -37,8 +37,7 @@ public class Model {
     @Column(nullable = false)
     private String category;
 
-    @Size(max = 2000, message = "description cannot be longer than 1000 characters")
-    @Column(length = 1000)
+    @Column(length = 2000)
     private String description;
 
     @Column(nullable = false)
@@ -56,7 +55,6 @@ public class Model {
     private LocalDateTime updatedAt;
     private LocalDateTime deadline;
 
-    @Size(max = 2000, message = "note cannot be longer than 2000 characters")
     @Column(length = 2000)
     private String notes;
 

@@ -5,16 +5,20 @@ import com.tekstil.textile_management_system.dto.StageHistoryRequestDTO;
 import com.tekstil.textile_management_system.dto.StageHistoryResponseDTO;
 import com.tekstil.textile_management_system.entity.ModelStageHistory;
 import com.tekstil.textile_management_system.entity.User;
+import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.service.ModelStageHistoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@Validated
 @RequestMapping("/api/stage-histories")
 @RequiredArgsConstructor
 public class ModelStageHistoryController {
@@ -22,7 +26,7 @@ public class ModelStageHistoryController {
     private final ModelStageHistoryService modelStageHistoryService;
 
     @PostMapping
-    public ResponseEntity<BaseResponse<StageHistoryResponseDTO>> createStageHistory(@RequestBody StageHistoryRequestDTO dto) {
+    public ResponseEntity<BaseResponse<StageHistoryResponseDTO>> createStageHistory(@Valid @RequestBody StageHistoryRequestDTO dto) {
 
         boolean exists = modelStageHistoryService.existsByModelIdAndStageId(
                 dto.getModelId(),
@@ -93,14 +97,14 @@ public class ModelStageHistoryController {
                 .body(BaseResponse.success(HttpStatus.OK.value(), "models by assigned users",modelStageHistories));
     }
     @GetMapping("/by-status")
-    public ResponseEntity<BaseResponse<List<ModelStageHistory>>> findByStatus(@RequestParam String status) {
+    public ResponseEntity<BaseResponse<List<ModelStageHistory>>> findByStatus( @RequestParam ModelStatus status) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(BaseResponse.success(HttpStatus.OK.value(), "models by status",modelStageHistoryService.findByStatus(status)));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse<StageHistoryResponseDTO>> updateStageHistory(@PathVariable Long id, @RequestBody StageHistoryRequestDTO stageHistory) {
+    public ResponseEntity<BaseResponse<StageHistoryResponseDTO>> updateStageHistory(@PathVariable Long id,@Valid @RequestBody StageHistoryRequestDTO stageHistory) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -12,8 +12,6 @@ import com.tekstil.textile_management_system.mapper.StageMapper;
 import com.tekstil.textile_management_system.repository.StageRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

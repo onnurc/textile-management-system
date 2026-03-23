@@ -6,6 +6,7 @@ import com.tekstil.textile_management_system.entity.Model;
 import com.tekstil.textile_management_system.entity.ModelStageHistory;
 import com.tekstil.textile_management_system.entity.Stage;
 import com.tekstil.textile_management_system.entity.User;
+import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.exception.ResourceNotFoundException;
 import com.tekstil.textile_management_system.mapper.StageHistoryMapper;
 import com.tekstil.textile_management_system.repository.ModelRepository;
@@ -84,7 +85,7 @@ public class ModelStageHistoryService {
                 .map(StageHistoryMapper::toResponseDTO)
                 .toList();
     }
-    public List<ModelStageHistory> findByStatus(String status) {
+    public List<ModelStageHistory> findByStatus(ModelStatus status) {
         return modelStageHistoryRepository.findByStatus(status);
     }
 

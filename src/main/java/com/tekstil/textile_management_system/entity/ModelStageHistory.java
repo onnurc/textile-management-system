@@ -32,7 +32,6 @@ public class ModelStageHistory {
 
     private String status = "IN_PROGRESS";
 
-    @Size(max = 1000, message = "waiting reason cannot be longer than 1000 characters")
     @Column(length = 1000)
     private String waitingReason;
 

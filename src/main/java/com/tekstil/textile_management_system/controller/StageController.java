@@ -8,6 +8,7 @@ import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.mapper.StageMapper;
 import com.tekstil.textile_management_system.service.ModelStageHistoryService;
 import com.tekstil.textile_management_system.service.StageService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class StageController {
     private final ModelStageHistoryService modelStageHistoryService;
 
     @PostMapping
-    public ResponseEntity<BaseResponse<StageResponseDTO>> createStage(@RequestBody StageRequestDTO stage) {
+    public ResponseEntity<BaseResponse<StageResponseDTO>> createStage(@Valid @RequestBody StageRequestDTO stage) {
         StageResponseDTO created = stageService.createStage(stage);
              return ResponseEntity
                      .status(HttpStatus.CREATED)
@@ -99,7 +100,7 @@ public class StageController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse<StageResponseDTO>> updateStage(@PathVariable Long id, @RequestBody StageRequestDTO dto) {
+    public ResponseEntity<BaseResponse<StageResponseDTO>> updateStage( @PathVariable Long id,@Valid @RequestBody StageRequestDTO dto) {
 
         StageResponseDTO updated = stageService.updateStage(id, dto);
 

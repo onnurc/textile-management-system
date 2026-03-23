@@ -2,6 +2,7 @@ package com.tekstil.textile_management_system.entity;
 
 import com.tekstil.textile_management_system.enums.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     @Column(nullable = false,unique = true)
     private String email;
