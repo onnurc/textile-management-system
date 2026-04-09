@@ -2,6 +2,7 @@ package com.tekstil.textile_management_system.service;
 
 import com.tekstil.textile_management_system.dto.UserRequestDTO;
 import com.tekstil.textile_management_system.dto.UserResponseDTO;
+import com.tekstil.textile_management_system.dto.UserUpdateDTO;
 import com.tekstil.textile_management_system.entity.User;
 import com.tekstil.textile_management_system.enums.Role;
 import com.tekstil.textile_management_system.exception.AlreadyExistsException;
@@ -10,6 +11,7 @@ import com.tekstil.textile_management_system.mapper.UserMapper;
 import com.tekstil.textile_management_system.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
 
     public UserResponseDTO createUser(UserRequestDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
@@ -76,14 +80,20 @@ public class UserService {
                 .toList();
     }
 
-    public UserResponseDTO updateUser(Long id, UserRequestDTO dto) {
+    public UserResponseDTO updateUser(Long id, UserUpdateDTO dto) {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
         existing.setEmail(dto.getEmail());
         existing.setFullName(dto.getFullName());
         existing.setRole(dto.getRole());
+        if (dto.getActive() != null) existing.setActive(dto.getActive());
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            existing.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
         return UserMapper.toResponseDTO(userRepository.save(existing));
     }
+
+
 
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {

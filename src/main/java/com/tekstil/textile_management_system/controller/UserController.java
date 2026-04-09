@@ -3,6 +3,7 @@ package com.tekstil.textile_management_system.controller;
 import com.tekstil.textile_management_system.dto.BaseResponse;
 import com.tekstil.textile_management_system.dto.UserRequestDTO;
 import com.tekstil.textile_management_system.dto.UserResponseDTO;
+import com.tekstil.textile_management_system.dto.UserUpdateDTO;
 import com.tekstil.textile_management_system.enums.Role;
 import com.tekstil.textile_management_system.service.UserService;
 import jakarta.validation.Valid;
@@ -79,7 +80,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<BaseResponse<UserResponseDTO>> updateUser(
-            @PathVariable @Min(1) Long id, @RequestBody @Valid UserRequestDTO dto) {
+            @PathVariable @Min(1) Long id, @RequestBody @Valid UserUpdateDTO dto) {
         UserResponseDTO updated = userService.updateUser(id, dto);
         return ResponseEntity.ok(BaseResponse.success(200, "User updated", updated));
     }

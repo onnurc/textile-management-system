@@ -28,6 +28,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .formLogin(form->form.disable())// new line
+                .httpBasic(basic -> basic.disable())// new line
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()  // login & register herkese açık
                         .anyRequest().authenticated()                  // geri kalan her şey korumalı

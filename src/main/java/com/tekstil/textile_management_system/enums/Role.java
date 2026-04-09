@@ -12,7 +12,8 @@ public enum Role {
     CUTTER("Cutter", "Responsible for fabric cutting operations"),
     TRIM_SPECIALIST("Trim Specialist", "Responsible for buttons, zippers, labels, and all garment accessories"),
     ATOLYE_MANAGER("Atolye Chef", "Coordinates the mass production and sewing line"),
-    PACKAGING_SPECIALIST("Packaging Specialist", "Handles final packing and folding");
+    PACKAGING_SPECIALIST("Packaging Specialist", "Handles final packing and folding"),
+    PENDING("Pending","Awaiting role assignment");
 
     private final String displayName;
     private final String description;

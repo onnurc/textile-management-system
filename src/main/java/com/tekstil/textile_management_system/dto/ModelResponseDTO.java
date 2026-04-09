@@ -26,7 +26,6 @@ public class ModelResponseDTO {
     private Long assignedToUserId;
     private String assignedToFullName;
 
-
 }
 
 
