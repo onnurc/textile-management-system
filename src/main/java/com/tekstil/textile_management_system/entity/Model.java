@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.enums.Priority;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +26,8 @@ public class Model {
 
     @Column(nullable = false)
     private String modelName;
+
+
 
     @Column(nullable = false)
     private String brand;
@@ -51,6 +52,9 @@ public class Model {
     @Column(nullable = false)
     private String sizeRange;
 
+
+
+
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt;
     private LocalDateTime deadline;
@@ -61,6 +65,11 @@ public class Model {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_to_user_id")
     private User assignedTo;
+
+
+    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
+
 
     //one side is model, there is lots of stages
     @JsonIgnore

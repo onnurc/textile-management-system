@@ -66,8 +66,6 @@ public class ModelController {
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(BaseResponse.success(HttpStatus.OK.value(), "Models by name",model1));
-
-
     }
     // READ BY STATUS: GET /api/models/status/
     @GetMapping("/status/{status}")

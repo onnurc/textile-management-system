@@ -32,4 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 ### ENV ###
-.env
+.envapplication-aws.properties

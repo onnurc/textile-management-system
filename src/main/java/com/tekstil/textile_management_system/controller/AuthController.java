@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth/login")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -23,6 +22,8 @@ public class AuthController {
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request){
         return ResponseEntity.ok(authService.register(request));
     }
+
+    @RequestMapping("/api/auth/login")
     @PostMapping
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request){
         return  ResponseEntity.ok(authService.login(request));

@@ -11,7 +11,7 @@ public enum Role {
     OPERATOR("Machine Operator", "Performs mass production sewing"),
     CUTTER("Cutter", "Responsible for fabric cutting operations"),
     TRIM_SPECIALIST("Trim Specialist", "Responsible for buttons, zippers, labels, and all garment accessories"),
-    ATOLYE_MANAGER("Atolye Chef", "Coordinates the mass production and sewing line"),
+    ATOLYE_MANAGER("Fason", "Coordinates the mass production and sewing line"),
     PACKAGING_SPECIALIST("Packaging Specialist", "Handles final packing and folding"),
     PENDING("Pending","Awaiting role assignment");
 
