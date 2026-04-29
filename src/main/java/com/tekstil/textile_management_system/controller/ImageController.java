@@ -10,13 +10,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@RequestMapping("/api/models/{modelId}/images")
 @RestController
 public class ImageController {
 
     @Autowired
     private ImageService modelImageService;
 
-    @RequestMapping("/api/models/{modelId}/images")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ImageDTO> upload(
             @PathVariable Long modelId,
@@ -26,8 +26,7 @@ public class ImageController {
         return ResponseEntity.ok(modelImageService.upload(modelId, file, isPrimary));
     }
 
-    @RequestMapping("/api/models/images")
-    @GetMapping
+    @GetMapping("/api/models/images")
     public ResponseEntity<List<ImageDTO>> getImages(@PathVariable Long modelId) {
         return ResponseEntity.ok(modelImageService.getImages(modelId));
     }

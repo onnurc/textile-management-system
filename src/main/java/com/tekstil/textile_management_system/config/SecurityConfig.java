@@ -38,17 +38,19 @@ public class SecurityConfig {
                             "http://textile-management-frontend.s3-website.eu-west-2.amazonaws.com",
                             "http://localhost:5173"
                     ));
-                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH","DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
                     config.setAllowCredentials(true);
                     return config;
                 }))
                 .csrf(csrf -> csrf.disable())
-                .formLogin(form->form.disable())// new line
-                .httpBasic(basic -> basic.disable())// new line
+                .formLogin(form->form.disable())
+                .httpBasic(basic -> basic.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()  // login & register herkese açık
-                        .anyRequest().authenticated()                  // geri kalan her şey korumalı
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/register").permitAll()
+                        .requestMatchers("/api/user/resetPassword", "/api/user/changePassword").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
