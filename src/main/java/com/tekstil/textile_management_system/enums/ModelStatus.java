@@ -17,7 +17,6 @@ public enum ModelStatus {
     private final String displayName;
     private final String description;
 
-
     ModelStatus(String displayName, String descripton) {
         this.displayName = displayName;
         this.description = descripton;

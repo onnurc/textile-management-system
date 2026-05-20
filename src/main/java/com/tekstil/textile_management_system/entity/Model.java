@@ -1,15 +1,14 @@
 package com.tekstil.textile_management_system.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.enums.Priority;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.sql.results.graph.Fetch;
 
-import javax.smartcardio.ATR;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +27,8 @@ public class Model {
     @Column(nullable = false)
     private String modelName;
 
+
+
     @Column(nullable = false)
     private String brand;
 
@@ -37,7 +38,7 @@ public class Model {
     @Column(nullable = false)
     private String category;
 
-    @Column(length = 1000)
+    @Column(length = 2000)
     private String description;
 
     @Column(nullable = false)
@@ -51,10 +52,11 @@ public class Model {
     @Column(nullable = false)
     private String sizeRange;
 
+
+
+
     private LocalDateTime createdAt = LocalDateTime.now();
-
     private LocalDateTime updatedAt;
-
     private LocalDateTime deadline;
 
     @Column(length = 2000)
@@ -64,39 +66,19 @@ public class Model {
     @JoinColumn(name = "assigned_to_user_id")
     private User assignedTo;
 
+
+    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
+
+
     //one side is model, there is lots of stages
+    @JsonIgnore
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelStageHistory> stageHistory = new ArrayList<>();
-
-    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ModelMeasurements> measurements = new ArrayList<>();
-
-    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<ModelMaterials> materials = new ArrayList<>();
-
-    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<ModelAccessories> accessories = new ArrayList<>();
-
-    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<ModelImages> images = new ArrayList<>();
-
-    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<ModelComments> comments = new ArrayList<>();
 
     @PreUpdate
     public void preUpdate(){
         this.updatedAt = LocalDateTime.now();
     }
-
-
-
-
-
-
-
-
-
-
-
 
 }

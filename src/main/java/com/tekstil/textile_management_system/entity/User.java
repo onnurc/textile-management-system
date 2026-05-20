@@ -2,11 +2,13 @@ package com.tekstil.textile_management_system.entity;
 
 import com.tekstil.textile_management_system.enums.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -34,9 +36,10 @@ public class User {
     private Role role;
 
     @Column(nullable = false)
-    private boolean active;
+    private Boolean active;
 
-    private LocalDate createdAt = LocalDate.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
+
 
 
 }

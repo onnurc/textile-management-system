@@ -1,6 +1,7 @@
 package com.tekstil.textile_management_system.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -13,8 +14,8 @@ public class ModelStageHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "model_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "model_id",nullable = false)
     private Model model;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,7 +23,7 @@ public class ModelStageHistory {
     private Stage stage;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assigned_user_id", foreignKey = @ForeignKey(name = "FK_HISTORY_USER"))
+    @JoinColumn(name = "assigned_user_id", foreignKey = @ForeignKey(name = "FK_HISTORY_USER"),nullable = false)
     private User assignedUser;
 
     private LocalDateTime completedAt;
@@ -37,9 +38,11 @@ public class ModelStageHistory {
     @Column(columnDefinition = "TEXT")
     private String checklistProgress;
 
+    @Size(max = 2000, message = "note cannot be longer than 2000 characters")
     @Column(length = 2000)
     private String notes;
 
+    @PreUpdate
     public void preUpdate(){
         if ("COMPLETED".equals(this.status) && this.completedAt == null){
             this.completedAt = LocalDateTime.now();
