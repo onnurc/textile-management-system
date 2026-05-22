@@ -27,8 +27,6 @@ public class Model {
     @Column(nullable = false)
     private String modelName;
 
-
-
     @Column(nullable = false)
     private String brand;
 
@@ -52,9 +50,6 @@ public class Model {
     @Column(nullable = false)
     private String sizeRange;
 
-
-
-
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt;
     private LocalDateTime deadline;
@@ -71,7 +66,6 @@ public class Model {
     private List<Image> images = new ArrayList<>();
 
 
-    //one side is model, there is lots of stages
     @JsonIgnore
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelStageHistory> stageHistory = new ArrayList<>();

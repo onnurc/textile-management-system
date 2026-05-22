@@ -42,14 +42,8 @@ public class ModelService {
         return ModelMapper.toResponseDTO(modelRepository.save(model));
     }
 
-    public List <ModelResponseDTO> findAll(){
-        List<Model> models = modelRepository.findAll();
-
-        if (models.isEmpty()){
-            throw new ResourceNotFoundException("No model found ");
-        }
-
-        return models
+    public List<ModelResponseDTO> findAll(){
+        return modelRepository.findAll()
                 .stream()
                 .map(ModelMapper::toResponseDTO)
                 .toList();

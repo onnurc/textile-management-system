@@ -133,7 +133,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        passwordTokenRepository.delete(passToken); // kullanılmış token'ı sil
+        passwordTokenRepository.delete(passToken);
     }
 
 }
