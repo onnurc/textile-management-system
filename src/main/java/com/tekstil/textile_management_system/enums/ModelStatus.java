@@ -5,9 +5,9 @@ public enum ModelStatus {
     TECHNICAL_DESIGN("Technical Design", "Technical patterns and size charts are being developed"),
     IN_PRODUCTION("In Production", "Mass production sewing is in progress"),
     IN_CUTTING("In Cutting", "Fabric is being cut for mass production"),
-    MATERIAL_PREPARATION("Material Preparation", "Materials and accessories are being prepared"),
-    SERIAL_PRODUCTION("Serial Production", "Serial production is in progress"),
-    IN_WAREHOUSE("In Warehouse", "Products are being packaged and stored in warehouse"),
+    MATERIAL_PREPARATION("Material Prep", "Materials and fabrics are being gathered"),
+    SERIAL_PRODUCTION("Serial Production", "Mass production sewing is in progress"),
+    IN_WAREHOUSE("In Warehouse", "Products are stored in warehouse"),
     COMPLETED("Completed", "The model/order has been delivered"),
     CANCELLED("Cancelled", "The model or order has been terminated");
 

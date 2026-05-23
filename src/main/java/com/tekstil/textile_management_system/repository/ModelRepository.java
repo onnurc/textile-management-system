@@ -28,6 +28,6 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
 
     boolean existsByModelName(String modelName);
 
-
     List<Model> findByStatus(ModelStatus status);
+    List<Model> findByAssignedTo_Id(Long userId);
 }

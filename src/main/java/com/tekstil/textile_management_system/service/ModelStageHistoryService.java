@@ -79,14 +79,17 @@ public class ModelStageHistoryService {
                 .toList();
     }
 
-    public List<StageHistoryResponseDTO> findByAssignedUser(String userName) {
-        return modelStageHistoryRepository.findByAssignedUserOrderByCompletedAtDesc(userName)
+    public List<StageHistoryResponseDTO> findByAssignedUser(String email) {
+        return modelStageHistoryRepository.findByAssignedUser_EmailOrderByCompletedAtDesc(email)
                 .stream()
                 .map(StageHistoryMapper::toResponseDTO)
                 .toList();
     }
-    public List<ModelStageHistory> findByStatus(ModelStatus status) {
-        return modelStageHistoryRepository.findByStatus(status);
+    public List<StageHistoryResponseDTO> findByStatus(ModelStatus status) {
+        return modelStageHistoryRepository.findByStatus(status)
+                .stream()
+                .map(StageHistoryMapper::toResponseDTO)
+                .toList();
     }
 
     public StageHistoryResponseDTO updateStageHistory(Long id, StageHistoryRequestDTO updated) {
@@ -117,4 +120,8 @@ public class ModelStageHistoryService {
     public boolean existsByModelIdAndStageId(Long modelId, Long stageId) {
         return modelStageHistoryRepository.existsByModelIdAndStageId(modelId,stageId);
     }
+    public List<StageHistoryResponseDTO> findByAssignedUserEmail(String email) {
+        return findByAssignedUser(email); // delegates to existing method
+    }
+
 }

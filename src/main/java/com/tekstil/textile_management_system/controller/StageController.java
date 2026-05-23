@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,12 +22,14 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/stages")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('COMPANY_MANAGER','STYLIST','MODELIST','OPERATOR','CUTTER','TRIM_SPECIALIST','FASON','PACKAGING_SPECIALIST')")
 public class StageController {
 
     private final StageService stageService;
     private final ModelStageHistoryService modelStageHistoryService;
 
     @PostMapping
+    @PreAuthorize("hasRole('COMPANY_MANAGER')")
     public ResponseEntity<BaseResponse<StageResponseDTO>> createStage(@Valid @RequestBody StageRequestDTO stage) {
         StageResponseDTO created = stageService.createStage(stage);
              return ResponseEntity
@@ -100,6 +103,7 @@ public class StageController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('COMPANY_MANAGER')")
     public ResponseEntity<BaseResponse<StageResponseDTO>> updateStage( @PathVariable Long id,@Valid @RequestBody StageRequestDTO dto) {
 
         StageResponseDTO updated = stageService.updateStage(id, dto);
@@ -110,6 +114,7 @@ public class StageController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('COMPANY_MANAGER')")
     public ResponseEntity<BaseResponse<Void>> deleteStage(@PathVariable Long id) {
 
         stageService.deleteStage(id);

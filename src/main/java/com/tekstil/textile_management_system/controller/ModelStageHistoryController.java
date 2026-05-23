@@ -3,29 +3,31 @@ package com.tekstil.textile_management_system.controller;
 import com.tekstil.textile_management_system.dto.BaseResponse;
 import com.tekstil.textile_management_system.dto.StageHistoryRequestDTO;
 import com.tekstil.textile_management_system.dto.StageHistoryResponseDTO;
-import com.tekstil.textile_management_system.entity.ModelStageHistory;
-import com.tekstil.textile_management_system.entity.User;
 import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.service.ModelStageHistoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @Validated
 @RequestMapping("/api/stage-histories")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('COMPANY_MANAGER','STYLIST','MODELIST','OPERATOR','CUTTER','TRIM_SPECIALIST','FASON','PACKAGING_SPECIALIST')")
 public class ModelStageHistoryController {
 
     private final ModelStageHistoryService modelStageHistoryService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('COMPANY_MANAGER','STYLIST','MODELIST','OPERATOR','CUTTER','TRIM_SPECIALIST','FASON','PACKAGING_SPECIALIST')")
     public ResponseEntity<BaseResponse<StageHistoryResponseDTO>> createStageHistory(@Valid @RequestBody StageHistoryRequestDTO dto) {
 
         boolean exists = modelStageHistoryService.existsByModelIdAndStageId(
@@ -42,6 +44,16 @@ public class ModelStageHistoryController {
                 .body(BaseResponse.success(HttpStatus.CREATED.value(), "Stage History created", modelStageHistoryService.createStageHistory(dto)));
     }
 
+    @GetMapping("/mine")
+    @PreAuthorize("hasAnyRole('COMPANY_MANAGER','STYLIST','MODELIST','OPERATOR','CUTTER','TRIM_SPECIALIST','FASON','PACKAGING_SPECIALIST')")
+    public ResponseEntity<BaseResponse<List<StageHistoryResponseDTO>>> getMyHistories(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        List<StageHistoryResponseDTO> histories =
+                modelStageHistoryService.findByAssignedUserEmail(userDetails.getUsername());
+        return ResponseEntity.ok(BaseResponse.success(200, "My stage histories", histories));
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse<StageHistoryResponseDTO>> getStageHistoryById(@PathVariable Long id) {
 
@@ -51,8 +63,8 @@ public class ModelStageHistoryController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('COMPANY_MANAGER')")
     public ResponseEntity<BaseResponse<List<StageHistoryResponseDTO>>> getAllStageHistories() {
-
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(BaseResponse.success(HttpStatus.OK.value(),"All stages fetched", modelStageHistoryService.findAll()));
@@ -82,6 +94,7 @@ public class ModelStageHistoryController {
     }
 
     @GetMapping("/by-user/{userName}")
+    @PreAuthorize("hasRole('COMPANY_MANAGER')")
     public ResponseEntity<BaseResponse<List<StageHistoryResponseDTO>>> findByAssignedUser(@PathVariable String userName) {
 
         List<StageHistoryResponseDTO> modelStageHistories = modelStageHistoryService.findByAssignedUser(userName);
@@ -97,13 +110,16 @@ public class ModelStageHistoryController {
                 .body(BaseResponse.success(HttpStatus.OK.value(), "models by assigned users",modelStageHistories));
     }
     @GetMapping("/by-status")
-    public ResponseEntity<BaseResponse<List<ModelStageHistory>>> findByStatus( @RequestParam ModelStatus status) {
-
+    @PreAuthorize("hasRole('COMPANY_MANAGER')")
+    public ResponseEntity<BaseResponse<List<StageHistoryResponseDTO>>> findByStatus( @RequestParam ModelStatus status) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(BaseResponse.success(HttpStatus.OK.value(), "models by status",modelStageHistoryService.findByStatus(status)));
+                .body(BaseResponse.success(HttpStatus.OK.value(),
+                        "models by status",
+                        modelStageHistoryService.findByStatus(status)));
     }
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('COMPANY_MANAGER','STYLIST','MODELIST','OPERATOR','CUTTER','TRIM_SPECIALIST','FASON','PACKAGING_SPECIALIST')")
     public ResponseEntity<BaseResponse<StageHistoryResponseDTO>> updateStageHistory(@PathVariable Long id,@Valid @RequestBody StageHistoryRequestDTO stageHistory) {
 
         return ResponseEntity
@@ -113,6 +129,7 @@ public class ModelStageHistoryController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('COMPANY_MANAGER')")
     public ResponseEntity<BaseResponse<Void>> deleteStageHistory(@PathVariable Long id) {
         modelStageHistoryService.deleteStageHistory(id);
         return ResponseEntity

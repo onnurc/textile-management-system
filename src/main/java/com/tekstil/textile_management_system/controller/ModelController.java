@@ -1,8 +1,6 @@
 package com.tekstil.textile_management_system.controller;
 import com.tekstil.textile_management_system.dto.ModelRequestDTO;
 import com.tekstil.textile_management_system.dto.ModelResponseDTO;
-import com.tekstil.textile_management_system.entity.Model;
-
 import com.tekstil.textile_management_system.dto.BaseResponse;
 import com.tekstil.textile_management_system.enums.ModelStatus;
 import com.tekstil.textile_management_system.service.ModelService;
@@ -11,24 +9,26 @@ import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import com.tekstil.textile_management_system.service.ModelService;
-
 import java.util.List;
-import java.util.Optional;
-
-import static org.springframework.web.servlet.function.ServerResponse.status;
 
 @RestController
 @RequestMapping("/api/models")
 @RequiredArgsConstructor
 @Validated
+@PreAuthorize("hasAnyRole('COMPANY_MANAGER','STYLIST','MODELIST','OPERATOR','CUTTER','TRIM_SPECIALIST','FASON','PACKAGING_SPECIALIST')")
 public class ModelController {
     private final ModelService modelService;
 
     //CREATE: POST /api/models
+
+
     @PostMapping
+    @PreAuthorize("hasAnyRole('COMPANY_MANAGER')")
     public ResponseEntity<BaseResponse<ModelResponseDTO>> createModel(@RequestBody @Valid ModelRequestDTO dto) {
         ModelResponseDTO created = modelService.createModel(dto);
         return ResponseEntity
@@ -38,12 +38,12 @@ public class ModelController {
 
     //READ ALL: GET /api/models
     @GetMapping
-    public ResponseEntity<BaseResponse<List<ModelResponseDTO>>> getAllModels() {
-        List<ModelResponseDTO> models = modelService.findAll();
-
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(BaseResponse.success(HttpStatus.OK.value(), "All models retrieved", models));
+    public ResponseEntity<BaseResponse<List<ModelResponseDTO>>> getAllModels(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        List<ModelResponseDTO> models = modelService.findAll(userDetails);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(BaseResponse.success(HttpStatus.OK.value(), "All models retrieved", models));
     }
 
     // READ ONE: GET /api/models/5
@@ -78,6 +78,7 @@ public class ModelController {
 
     }
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('COMPANY_MANAGER','STYLIST','MODELIST','OPERATOR','CUTTER','TRIM_SPECIALIST','FASON','PACKAGING_SPECIALIST')")
     public ResponseEntity<BaseResponse<ModelResponseDTO>> updateModel(@PathVariable Long id, @RequestBody @Valid ModelRequestDTO dto) {
 
             return ResponseEntity
@@ -86,6 +87,7 @@ public class ModelController {
         }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('COMPANY_MANAGER')")
     public ResponseEntity<BaseResponse<Void>> deleteModel(@PathVariable Long id) {
             modelService.deleteModel(id);
             return ResponseEntity
@@ -95,6 +97,7 @@ public class ModelController {
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('COMPANY_MANAGER','STYLIST','MODELIST','OPERATOR','CUTTER','TRIM_SPECIALIST','FASON','PACKAGING_SPECIALIST')")
     public ResponseEntity<BaseResponse<ModelResponseDTO>> changeStatus(@PathVariable @Min(1) Long id, @RequestParam  ModelStatus status) {
 
                 return ResponseEntity

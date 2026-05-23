@@ -21,5 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByCreatedAtAfter(LocalDateTime localDateTime);
 
     boolean existsByEmail(String email);
+    boolean existsByRole(Role role);
+
 
 }

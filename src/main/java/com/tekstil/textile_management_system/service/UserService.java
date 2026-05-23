@@ -9,10 +9,13 @@ import com.tekstil.textile_management_system.enums.Role;
 import com.tekstil.textile_management_system.exception.AlreadyExistsException;
 import com.tekstil.textile_management_system.exception.ResourceNotFoundException;
 import com.tekstil.textile_management_system.mapper.UserMapper;
+import com.tekstil.textile_management_system.repository.ModelStageHistoryRepository;
 import com.tekstil.textile_management_system.repository.PasswordTokenRepository;
 import com.tekstil.textile_management_system.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +30,17 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordTokenRepository passwordTokenRepository;
+    private final ModelStageHistoryRepository modelStageHistoryRepository;
+
 
 
     public UserResponseDTO createUser(UserRequestDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new AlreadyExistsException("User already exists: " + dto.getEmail());
         }
-        User saved = userRepository.save(UserMapper.toEntity(dto));
+        User user = UserMapper.toEntity(dto);
+        user.setPassword(passwordEncoder.encode(dto.getPassword())); // ekle
+        User saved = userRepository.save(user);
         return UserMapper.toResponseDTO(saved);
     }
 
@@ -99,14 +106,39 @@ public class UserService {
 
 
 
-    public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found: " + id);
+
+    public void deleteUser(Long id, UserDetails userDetails) throws BadRequestException {
+        User caller = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (caller.getId().equals(id)) {
+            throw new BadRequestException("you cannot delete yourself.");
         }
-        userRepository.deleteById(id);
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+
+        boolean hasHistory = modelStageHistoryRepository.existsByAssignedUser(user);
+
+        if (hasHistory) {
+            throw new BadRequestException("this user has pasr records, you cannot delete this user. you can make that deactive.");
+        }
+
+        passwordTokenRepository.deleteByUser(user);
+        userRepository.delete(user);
+    }
+
+    public UserResponseDTO deactivateUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+        user.setActive(false);
+        return UserMapper.toResponseDTO(userRepository.save(user));
     }
 
     public void createPasswordResetTokenForUser(User user, String token) {
+        passwordTokenRepository.findByUser(user)
+                .ifPresent(passwordTokenRepository::delete);
+        passwordTokenRepository.flush();
         PasswordResetToken myToken = new PasswordResetToken(token, user);
         passwordTokenRepository.save(myToken);
     }
@@ -122,7 +154,7 @@ public class UserService {
         if (passToken == null) return "Geçersiz token.";
         if (passToken.getExpiryDate().before(new Date())) return "Token süresi dolmuş.";
 
-        return null; // null = geçerli
+        return null;
     }
 
     public void changePasswordByToken(String token, String newPassword) {

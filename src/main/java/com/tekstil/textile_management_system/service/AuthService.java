@@ -4,6 +4,7 @@ import com.tekstil.textile_management_system.dto.AuthResponse;
 import com.tekstil.textile_management_system.dto.LoginRequest;
 import com.tekstil.textile_management_system.dto.RegisterRequest;
 import com.tekstil.textile_management_system.entity.User;
+import com.tekstil.textile_management_system.enums.Role;
 import com.tekstil.textile_management_system.exception.AlreadyExistsException;
 import com.tekstil.textile_management_system.repository.UserRepository;
 import com.tekstil.textile_management_system.security.JWTService;
@@ -12,6 +13,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +33,9 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(request.getFullName());
-        user.setRole(request.getRole());
+        user.setRole(Role.PENDING);
         user.setActive(true);
-
+        user.setCreatedAt(LocalDateTime.now());
         userRepository.save(user);
 
 

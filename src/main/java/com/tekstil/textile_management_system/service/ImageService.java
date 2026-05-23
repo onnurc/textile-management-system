@@ -56,7 +56,7 @@ public class ImageService {
     public List<ImageDTO> getImages(Long modelId) {
         return imageRepository.findByModelId(modelId)
                 .stream()
-                .map(img -> imageMapper.toDto(
+                .map(img -> ImageMapper.toDto(
                         img,
                         s3Service.generatePresignedUrl(img.getImageKey())
                 )).toList();

@@ -6,17 +6,22 @@ import com.tekstil.textile_management_system.dto.ModelResponseDTO;
 import com.tekstil.textile_management_system.entity.Model;
 import com.tekstil.textile_management_system.entity.User;
 import com.tekstil.textile_management_system.enums.ModelStatus;
+import com.tekstil.textile_management_system.enums.Role;
 import com.tekstil.textile_management_system.exception.AlreadyExistsException;
 import com.tekstil.textile_management_system.exception.ResourceNotFoundException;
+import com.tekstil.textile_management_system.repository.ModelMeasurementRepository;
 import com.tekstil.textile_management_system.repository.ModelRepository;
+import com.tekstil.textile_management_system.repository.ModelStageHistoryRepository;
 import com.tekstil.textile_management_system.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import com.tekstil.textile_management_system.mapper.ModelMapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +30,8 @@ public class ModelService {
 
     private final UserRepository userRepository;
     private final ModelRepository modelRepository;
+    private final ModelStageHistoryRepository stageHistoryRepository;
+    private final ModelMeasurementRepository measurementRepository;
 
     public ModelResponseDTO createModel(ModelRequestDTO dto) {
         if (modelRepository.existsByModelName(dto.getModelName())) {
@@ -42,9 +49,24 @@ public class ModelService {
         return ModelMapper.toResponseDTO(modelRepository.save(model));
     }
 
-    public List<ModelResponseDTO> findAll(){
-        return modelRepository.findAll()
-                .stream()
+    public List<ModelResponseDTO> findAll(UserDetails userDetails) {
+        User caller = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (caller.getRole() == Role.COMPANY_MANAGER) {
+            List<Model> all = modelRepository.findAll();
+            if (all.isEmpty()) throw new ResourceNotFoundException("No model found");
+            return all.stream().map(ModelMapper::toResponseDTO).toList();
+        }
+
+        List<Model> assigned = modelRepository.findByAssignedTo_Id(caller.getId());
+        List<Long> handledIds = stageHistoryRepository.findModelIdsByUserId(caller.getId());
+
+        return Stream.concat(
+                        assigned.stream(),
+                        modelRepository.findAllById(handledIds).stream()
+                )
+                .distinct()
                 .map(ModelMapper::toResponseDTO)
                 .toList();
     }
@@ -62,9 +84,11 @@ public class ModelService {
 
 
     public void deleteModel(Long id) {
-        if (!   modelRepository.existsById(id)){
+        // 1. Modelin var olup olmadığını kontrol et
+        if (!modelRepository.existsById(id)) {
             throw new ResourceNotFoundException("Model not found: " + id);
-    }
+        }
+        measurementRepository.deleteAllByModelId(id);
         modelRepository.deleteById(id);
     }
 
@@ -97,7 +121,7 @@ public class ModelService {
         existing.setDeadline(updatedModel.getDeadline());
         existing.setStatus(updatedModel.getStatus());
 
-        return ModelMapper.toResponseDTO(modelRepository.save(existing)); // ✅
+        return ModelMapper.toResponseDTO(modelRepository.save(existing));
 
     }
 
