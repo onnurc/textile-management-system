@@ -14,11 +14,9 @@ public class BaseResponse<T> {
     private String message;
     private T data;
 
-    // Başarılı response için static factory method
     public static <T> BaseResponse<T> success(int code, String message, T data) {
         return new BaseResponse<>(true, code, message, data);
     }
-    // Hatalı response için static factory method
     public static <T> BaseResponse<T> error(int code, String message) {
         return new BaseResponse<>(false, code, message, null);
     }

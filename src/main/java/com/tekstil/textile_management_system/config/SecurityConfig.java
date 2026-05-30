@@ -38,7 +38,9 @@ public class SecurityConfig {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOrigins(List.of(
                             "http://textile-management-frontend.s3-website.eu-west-2.amazonaws.com",
-                            "http://localhost:5173"
+                            "http://localhost:5173",
+                            "https://www.manusafabric.com",
+                            "https://manusafabric.com"
                     ));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH","DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
@@ -51,6 +53,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/register").permitAll()
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers("/api/user/resetPassword", "/api/user/changePassword").permitAll()
                         .anyRequest().authenticated()
                 )

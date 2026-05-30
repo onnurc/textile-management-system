@@ -26,7 +26,6 @@ public class PasswordResetController {
     private final UserService userService;
     private final JavaMailSender mailSender;
 
-    // 1. Adım: Email gönder
     @PostMapping("/api/user/resetPassword")
     public ResponseEntity<BaseResponse<Void>> resetPassword(@RequestParam("email") String userEmail) {
 
@@ -54,7 +53,6 @@ public class PasswordResetController {
         );
     }
 
-    // 2. Adım: Token doğrula ve şifreyi güncelle
     @PostMapping("/api/user/changePassword")
     public ResponseEntity<BaseResponse<Void>> changePassword(
             @RequestParam("token") String token,

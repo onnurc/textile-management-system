@@ -121,4 +121,6 @@ public class UserController {
         UserResponseDTO updated = userService.deactivateUser(id);
         return ResponseEntity.ok(BaseResponse.success(200, "User deactivated", updated));
     }
+
+
 }
